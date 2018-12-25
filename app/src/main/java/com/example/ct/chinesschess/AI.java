@@ -1,5 +1,8 @@
 package com.example.ct.chinesschess;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AI {
     void m_print(int[] result) {
         for(int i = 0; i < 10; i++) {
@@ -28,10 +31,8 @@ public class AI {
     }
     // a-b剪枝
     public node a_b(int[] cur) {
-        int height = 4;
+        int height = 3;
         node root = new node(cur, true, null);
-//        init(root, height-1);
-//        process(root);
         new_process(root, height-1);
         return root;
     }
@@ -53,110 +54,18 @@ public class AI {
         }
         return result;
     }
-
+    int[] power = {
+            600,600,270,270,120,120,120,120,
+            285,285,30,30,30,30,30,10000,
+            600,600,270,270,120,120,120,120,
+            285,285,30,30,30,30,30,10000
+    };
     // 获得棋力
     int get_power(int chess) {
-        // 车
-        if(chess == 1 || chess == 2 || chess == 17 || chess == 18)
-            return 600;
-        // 马
-        if(chess == 3 || chess == 4 || chess == 19 || chess == 20)
-            return 270;
-        // 象
-        if(chess == 5 || chess == 6 || chess == 21 || chess == 22)
-            return 120;
-        // 士
-        if(chess == 7 || chess == 8 || chess == 23 || chess == 24)
-            return 120;
-        // 将
-        if(chess == 16 || chess == 32)
-            return 10000;
-        // 炮
-        if(chess == 9 || chess == 10 || chess == 25 || chess == 26)
-            return 285;
-        // 兵
-        if(chess == 11 || chess == 12 || chess == 13 || chess == 14 || chess == 15 || chess == 27 || chess == 28 || chess == 29 || chess == 30 || chess == 31)
-            return 30;
-        return 0;
+        if(chess == 0)
+            return 0;
+        return power[chess-1];
     }
-
-//    void process(node p) {
-//        if(p.children.size() == 0)
-//            return;
-//        int cur;
-//        if(p.type) // 当前是极大层
-//            cur = Integer.MIN_VALUE;
-//        else        // 当前是极小层
-//            cur = Integer.MAX_VALUE;
-//        for(int i = 0; i < p.children.size(); i++) {
-//            if(p.children.get(i).children.size() == 0) {
-//                int value = evaluation(p.children.get(i).val);
-//                if(p.type) { // 极大层
-//                    if(value > cur) {
-//                        cur = value;
-//                        p.choose = i;
-//                    }
-//                    if(p.parent != null && p.parent.update == true && cur >= p.parent.b) {
-//                        p.a = cur;
-//                        return; // b剪枝
-//                    }
-//                } else { // 极小层
-//                    if(value < cur) {
-//                        cur = value;
-//                        p.choose = i;
-//                    }
-//                    if(p.parent != null && p.parent.update == true && p.parent.a >= cur) {
-//                        p.b = cur;
-//                        return; // a减枝
-//                    }
-//                }
-//            } else {
-//                process(p.children.get(i));
-//                if(p.type) { // 极大层
-//                    if(p.children.get(i).b > cur) {
-//                        cur = p.children.get(i).b;
-//                        p.choose = i;
-//                    }
-//                    if(p.parent != null && p.parent.update == true && cur >= p.parent.b) {
-//                        p.a = cur;
-//                        return; // b剪枝
-//                    }
-//                } else { // 极小层
-//                    if(p.children.get(i).a < cur) {
-//                        cur = p.children.get(i).a;
-//                        p.choose = i;
-//                    }
-//                    if(p.parent != null && p.parent.update == true && p.parent.a >= cur) {
-//                        p.b = cur;
-//                        return; // a剪枝
-//                    }
-//                }
-//            }
-//        }
-//        if(p.parent != null) {
-//            if(p.parent.update == false) {
-//                p.parent.update = true;
-//                if(p.parent.type) {
-//                    p.parent.a = cur;
-//                } else {
-//                    p.parent.b = cur;
-//                }
-//            } else {
-//                if(p.parent.type) {
-//                    if(p.parent.a < cur)
-//                        p.parent.a = cur;
-//                } else {
-//                    if(p.parent.b > cur)
-//                        p.parent.b = cur;
-//                }
-//            }
-//        }
-//        if(p.type) {
-//            p.a = cur;
-//        } else {
-//            p.b = cur;
-//        }
-//    }
 
     boolean game_over(int[] board) {
         int count = 0;
@@ -168,15 +77,16 @@ public class AI {
     }
 
     void new_process(node p, int height) {
+//    	List<Thread> thread_pool = new ArrayList<>();
         int[] data = str_to_vec(p.val);
         if(height == -1)
             return;
         if(game_over(data)) {
             int value = evaluation(p.val);
             if(p.type) {
-                p.a = value;
+                p.ex = value;
             } else {
-                p.b = value;
+                p.ex = value;
             }
             return;
         }
@@ -196,9 +106,6 @@ public class AI {
 //                    if(i == 12 && j == 39 && height==3) {
 //                    	m_print(new_val);
 //                    }
-//                	if(i == 43 && j == 40) {
-//                		m_print(new_val);
-//                	}
                     node child = new node(new_val, !p.type, p);
                     if(height == 0) {
                         int value = evaluation(child.val);
@@ -207,8 +114,8 @@ public class AI {
                                 cur = value;
                                 p.choose = child.val;
                             }
-                            if(p.parent != null && p.parent.update == true && cur >= p.parent.b) {
-                                p.a = cur;
+                            if(p.parent != null && p.parent.update == true && cur >= p.parent.ex) {
+                                p.ex = cur;
                                 return; // b剪枝
                             }
                         } else { // 极小层
@@ -216,83 +123,65 @@ public class AI {
                                 cur = value;
                                 p.choose = child.val;
                             }
-                            if(p.parent != null && p.parent.update == true && p.parent.a >= cur) {
-                                p.b = cur;
+                            if(p.parent != null && p.parent.update == true && p.parent.ex >= cur) {
+                                p.ex = cur;
                                 return; // a减枝
                             }
                         }
+//                        child = null;
                     } else {
                         new_process(child, height-1);
                         if(p.type) { // 极大层
-                            if(child.b > cur) {
-                                cur = child.b;
+                            if(child.ex > cur) {
+                                cur = child.ex;
                                 p.choose = child.val;
                             }
-                            if(p.parent != null && p.parent.update == true && cur >= p.parent.b) {
-                                p.a = cur;
+                            if(p.parent != null && p.parent.update == true && cur >= p.parent.ex) {
+                                p.ex = cur;
                                 return; // b剪枝
                             }
                         } else { // 极小层
-                            if(child.a < cur) {
-                                cur = child.a;
+                            if(child.ex < cur) {
+                                cur = child.ex;
                                 p.choose = child.val;
                             }
-                            if(p.parent != null && p.parent.update == true && p.parent.a >= cur) {
-                                p.b = cur;
+                            if(p.parent != null && p.parent.update == true && p.parent.ex >= cur) {
+                                p.ex = cur;
                                 return; // a剪枝
                             }
                         }
+//                    	Thread new_thread = new Thread() {
+//                    		public void run() {
+//
+//                    		}
+//                    	};
+//                    	new_thread.start();
                     }
-//                    child = null;
                 }
             }
         }
+//        try {
+//            for(int i = 0; i < thread_pool.size(); i++)
+//            	thread_pool.get(i).join();
+//        } catch(Exception e) {
+//        	System.out.println(e.getMessage());
+//        }
         if(p.parent != null) {
             if(p.parent.update == false) {
                 p.parent.update = true;
-                if(p.parent.type) {
-                    p.parent.a = cur;
-                } else {
-                    p.parent.b = cur;
-                }
+                p.parent.ex = cur;
             } else {
                 if(p.parent.type) {
-                    if(p.parent.a < cur)
-                        p.parent.a = cur;
+                    if(p.parent.ex < cur)
+                        p.parent.ex = cur;
                 } else {
-                    if(p.parent.b > cur)
-                        p.parent.b = cur;
+                    if(p.parent.ex > cur)
+                        p.parent.ex = cur;
                 }
             }
         }
-        if(p.type) {
-            p.a = cur;
-        } else {
-            p.b = cur;
-        }
+        p.ex = cur;
     }
-
-//    void init(node root, int height) {
-//        int[] data = str_to_vec(root.val);
-//        if(height == -1)
-//            return;
-//        if(game_over(data))
-//            return;
-//        for(int i = 0; i < data.length; i++) {
-//            if(data[i] < 17) {
-//                for(int j = 0; j < 90; j++) {
-//                    if(can_move(i, j, data)) {
-//                        int[] new_val = data.clone();
-//                        new_val[j] = new_val[i];
-//                        new_val[i] = 0;
-//                        node child = new node(new_val, !root.type, root);
-//                        root.children.add(child);
-//                        init(child, height-1);
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     boolean can_move(int from_index, int to_index, int[] board, boolean type) {
         if(to_index < 0 || to_index > 89)
@@ -583,3 +472,6 @@ public class AI {
         }
     }
 }
+
+
+

@@ -3,8 +3,7 @@ package com.example.ct.chinesschess;
 public class node {
     boolean type; // true:极大层  false:极小层
     boolean update;
-    int a;
-    int b;
+    int ex;
     String val;
     node parent;
     String choose;
@@ -15,5 +14,8 @@ public class node {
             this.val = this.val + val[i]+ ".";
         this.type = type;
         this.parent = parent;
+    }
+    void update(int ex) {
+        this.ex = ex;
     }
 }
