@@ -1,14 +1,13 @@
 package com.example.ct.chinesschess;
 
-import org.json.JSONArray;
-
-import java.util.ArrayList;
-
 public class AI {
     void m_print(int[] result) {
         for(int i = 0; i < 10; i++) {
             for(int j = 0; j < 9; j++) {
-                System.out.print(result[i*9+j]);
+                if(result[i*9+j] > 9)
+                    System.out.print(result[i*9+j]);
+                else
+                    System.out.print(" "+result[i*9+j]);
                 System.out.print(" ");
             }
             System.out.println("");
@@ -170,7 +169,7 @@ public class AI {
 
     void new_process(node p, int height) {
         int[] data = str_to_vec(p.val);
-        if(height == 0)
+        if(height == -1)
             return;
         if(game_over(data)) {
             int value = evaluation(p.val);
@@ -191,21 +190,22 @@ public class AI {
                 continue;
             for(int j = 0; j < 90; j++) {
                 if(can_move(i, j, data, p.type)) {
-//                	if(i == 22 && j == 58 && height==3) {
-//                		m_print(data);
-//                	}
                     int[] new_val = data.clone();
                     new_val[j] = new_val[i];
                     new_val[i] = 0;
+//                    if(i == 12 && j == 39 && height==3) {
+//                    	m_print(new_val);
+//                    }
+//                	if(i == 43 && j == 40) {
+//                		m_print(new_val);
+//                	}
                     node child = new node(new_val, !p.type, p);
-                    int child_index = p.children.size();
-                    p.children.add(child);
-                    if(height == 1) {
+                    if(height == 0) {
                         int value = evaluation(child.val);
                         if(p.type) { // 极大层
                             if(value > cur) {
                                 cur = value;
-                                p.choose = child_index;
+                                p.choose = child.val;
                             }
                             if(p.parent != null && p.parent.update == true && cur >= p.parent.b) {
                                 p.a = cur;
@@ -214,7 +214,7 @@ public class AI {
                         } else { // 极小层
                             if(value < cur) {
                                 cur = value;
-                                p.choose = child_index;
+                                p.choose = child.val;
                             }
                             if(p.parent != null && p.parent.update == true && p.parent.a >= cur) {
                                 p.b = cur;
@@ -226,7 +226,7 @@ public class AI {
                         if(p.type) { // 极大层
                             if(child.b > cur) {
                                 cur = child.b;
-                                p.choose = child_index;
+                                p.choose = child.val;
                             }
                             if(p.parent != null && p.parent.update == true && cur >= p.parent.b) {
                                 p.a = cur;
@@ -235,7 +235,7 @@ public class AI {
                         } else { // 极小层
                             if(child.a < cur) {
                                 cur = child.a;
-                                p.choose = child_index;
+                                p.choose = child.val;
                             }
                             if(p.parent != null && p.parent.update == true && p.parent.a >= cur) {
                                 p.b = cur;
@@ -243,6 +243,7 @@ public class AI {
                             }
                         }
                     }
+//                    child = null;
                 }
             }
         }
@@ -582,4 +583,3 @@ public class AI {
         }
     }
 }
-

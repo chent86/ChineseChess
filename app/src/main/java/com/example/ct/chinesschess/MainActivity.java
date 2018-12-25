@@ -99,7 +99,18 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
+    void record_board() {
+        for(int i = 0; i < 10; i++) {
+            for(int j = 0; j < 9; j++) {
+                System.out.print(board[i*9+j]);
+                System.out.print(", ");
+            }
+            System.out.println("");
+        }
+    }
+
     void update_action(int index) {
+        record_board();
         TextView AI_action = findViewById(R.id.AI_action);
         TextView player_action = findViewById(R.id.player_action);
         if(my_turn) {
@@ -319,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void call(final Subscriber<? super String> subscriber) {
                             node root =m_AI.a_b(board);
-                            AI_result = str_to_vec(root.children.get(root.choose).val).clone();
+                            AI_result = str_to_vec(root.choose).clone();
                             subscriber.onNext("OK");
                         }
                     });

@@ -1,8 +1,5 @@
 package com.example.ct.chinesschess;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class node {
     boolean type; // true:极大层  false:极小层
     boolean update;
@@ -10,8 +7,7 @@ public class node {
     int b;
     String val;
     node parent;
-    List<node> children;
-    int choose;
+    String choose;
     node(int[] val, boolean type, node parent) {
         this.update = false;
         this.val = "";
@@ -19,6 +15,5 @@ public class node {
             this.val = this.val + val[i]+ ".";
         this.type = type;
         this.parent = parent;
-        this.children = new ArrayList<>();
     }
 }
