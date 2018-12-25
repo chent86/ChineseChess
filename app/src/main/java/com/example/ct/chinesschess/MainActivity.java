@@ -59,17 +59,16 @@ public class MainActivity extends AppCompatActivity {
             17,19,21,23,32,24,22,20,18
     };
 //private int[] board = {
-//	       0, 0, 5, 7,16, 8, 6, 0, 2,
-//	       0, 0, 0, 1, 0, 0, 0, 0, 0,
-//	       9, 0, 3, 0, 0, 0, 4,10, 0,
-//	       11, 0,12, 0,0, 0,14, 0,15,
-//	       0, 0, 0, 0, 0, 0, 0, 0, 0,
-//	       0, 0, 0, 0, 25, 0, 0, 26, 0,
-//	       27, 0,28, 0,29, 0,30, 0,31,
-//	       0,0, 19, 0, 0, 0, 0,0, 0,
-//	       0, 0, 0, 0, 0, 0, 0, 0, 0,
-//	       0,17,21,23,32,24,22,20,18
-//
+//        1, 0, 5, 7, 16, 8, 6, 4, 2,
+//        0, 0, 0, 0, 0, 0, 0, 0, 0,
+//        0, 0, 3, 0, 0, 0, 0, 10, 0,
+//        11, 0, 12, 0, 25, 0, 14, 0, 15,
+//        0, 0, 0, 0, 0, 0, 0, 0, 0,
+//        0, 0, 0, 0, 0, 0, 0, 0, 0,
+//        27, 0, 28, 9, 0, 0, 30, 0, 31,
+//        0, 0, 0, 0, 0, 0, 20, 26, 0,
+//        0, 0, 0, 0, 0, 0, 0, 0, 18,
+//        17, 19, 21, 23, 32, 24, 22, 0, 0,
 //};
     int[] AI_result;
     void init_board() {
@@ -389,6 +388,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+    boolean double_pao() {
+        int pao_1 = 0, pao_2 = 0, king = 0;
+        for(int i = 0; i < 90; i++) {
+            if(board[i] == 25)
+                pao_1 = i;
+            else if(board[i] == 26)
+                pao_2 = i;
+            else if(board[i] == 16)
+                king = i;
+        }
+        return (pao_1%9==pao_2%9&& pao_1%9==king%9)||(pao_1/9 == pao_2/9 && pao_1/9==king/9);
+    }
 
     void click_chess(View view) {
         if(my_turn && !over) {
@@ -432,9 +443,9 @@ public class MainActivity extends AppCompatActivity {
                                 if(board[i] != 0)
                                     count++;
                             node root = null;
-//                            if(count%2 != 0 )
-//                                root =m_AI.a_b(board, 4);
-//                            else
+                            if(double_pao())
+                                root =m_AI.a_b(board, 4);
+                            else
                                 root =m_AI.a_b(board, 3);
                             AI_result = str_to_vec(root.choose).clone();
                             subscriber.onNext("OK");
@@ -443,7 +454,6 @@ public class MainActivity extends AppCompatActivity {
                     observable.subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(subscriber);
-
                 }
             }
         }
