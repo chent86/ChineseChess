@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
+                update_action(from_index);
                 ConstraintLayout c = findViewById(R.id.board);
                 ImageView from = (ImageView) c.getChildAt(from_index);
                 Drawable from_img = from.getBackground();
@@ -97,6 +98,42 @@ public class MainActivity extends AppCompatActivity {
             }
         };
     }
+
+    void update_action(int index) {
+        TextView AI_action = findViewById(R.id.AI_action);
+        TextView player_action = findViewById(R.id.player_action);
+        if(my_turn) {
+            player_action.setText("玩家: 动"+chess_name(board[index]));
+        } else {
+            AI_action.setText("AI: 动"+chess_name(board[index]));
+        }
+    }
+
+    String chess_name(int chess) {
+        // 车
+        if(chess == 1 || chess == 2 || chess == 17 || chess == 18)
+            return "车";
+        // 马
+        if(chess == 3 || chess == 4 || chess == 19 || chess == 20)
+            return "马";
+        // 象
+        if(chess == 5 || chess == 6 || chess == 21 || chess == 22)
+            return "象";
+        // 士
+        if(chess == 7 || chess == 8 || chess == 23 || chess == 24)
+            return "士";
+        // 将
+        if(chess == 16 || chess == 32)
+            return "将";
+        // 炮
+        if(chess == 9 || chess == 10 || chess == 25 || chess == 26)
+            return "炮";
+        // 兵
+        if(chess == 11 || chess == 12 || chess == 13 || chess == 14 || chess == 15 || chess == 27 || chess == 28 || chess == 29 || chess == 30 || chess == 31)
+            return "兵";
+        return "error";
+    }
+
     boolean can_move(int from_index, int to_index) {
         int from = board[from_index];
         int to = board[to_index];
@@ -156,6 +193,8 @@ public class MainActivity extends AppCompatActivity {
                     return false;
                 if(count == 0 && board[to_index] != 0) // 不跨子不能吃
                     return false;
+                if(count != 0 && board[to_index] == 0 ) // 不吃子不能跨
+                    return false;
             } else {
                 int count = 0;
                 if(from_index < to_index) {
@@ -170,6 +209,8 @@ public class MainActivity extends AppCompatActivity {
                 if(count > 1)
                     return false;
                 if(count == 0 && board[to_index] != 0) // 不跨子不能吃
+                    return false;
+                if(count != 0 && board[to_index] == 0 ) // 不吃子不能跨
                     return false;
             }
         }
@@ -259,6 +300,7 @@ public class MainActivity extends AppCompatActivity {
                     last_click = id;
                 }
                 else if(can_move(last_click, id)) {
+                    update_action(last_click);
                     ImageView from = (ImageView) c.getChildAt(last_click);
                     Drawable from_img = from.getBackground();
                     c.getChildAt(last_click).setBackground(null);

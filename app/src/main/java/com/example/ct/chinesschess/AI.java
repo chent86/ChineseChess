@@ -5,6 +5,21 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 
 public class AI {
+    void m_print(int[] result) {
+        for(int i = 0; i < 10; i++) {
+            for(int j = 0; j < 9; j++) {
+                System.out.print(result[i*9+j]);
+                System.out.print(" ");
+            }
+            System.out.println("");
+        }
+    }
+    String vec_to_str(int[] v) {
+        String result = "";
+        for(int i = 0; i < v.length; i++)
+            result = result + v[i] + ".";
+        return result;
+    }
     static int[] str_to_vec(String str) {
         int[] result = new int[90];
         String[] s = str.split("\\.");
@@ -14,10 +29,11 @@ public class AI {
     }
     // a-b剪枝
     public node a_b(int[] cur) {
-        int height = 2;
+        int height = 4;
         node root = new node(cur, true, null);
-        init(root, height-1);
-        process(root);
+//        init(root, height-1);
+//        process(root);
+        new_process(root, height-1);
         return root;
     }
 
@@ -65,55 +81,167 @@ public class AI {
         return 0;
     }
 
-    void process(node p) {
-        if(p.children.size() == 0)
+//    void process(node p) {
+//        if(p.children.size() == 0)
+//            return;
+//        int cur;
+//        if(p.type) // 当前是极大层
+//            cur = Integer.MIN_VALUE;
+//        else        // 当前是极小层
+//            cur = Integer.MAX_VALUE;
+//        for(int i = 0; i < p.children.size(); i++) {
+//            if(p.children.get(i).children.size() == 0) {
+//                int value = evaluation(p.children.get(i).val);
+//                if(p.type) { // 极大层
+//                    if(value > cur) {
+//                        cur = value;
+//                        p.choose = i;
+//                    }
+//                    if(p.parent != null && p.parent.update == true && cur >= p.parent.b) {
+//                        p.a = cur;
+//                        return; // b剪枝
+//                    }
+//                } else { // 极小层
+//                    if(value < cur) {
+//                        cur = value;
+//                        p.choose = i;
+//                    }
+//                    if(p.parent != null && p.parent.update == true && p.parent.a >= cur) {
+//                        p.b = cur;
+//                        return; // a减枝
+//                    }
+//                }
+//            } else {
+//                process(p.children.get(i));
+//                if(p.type) { // 极大层
+//                    if(p.children.get(i).b > cur) {
+//                        cur = p.children.get(i).b;
+//                        p.choose = i;
+//                    }
+//                    if(p.parent != null && p.parent.update == true && cur >= p.parent.b) {
+//                        p.a = cur;
+//                        return; // b剪枝
+//                    }
+//                } else { // 极小层
+//                    if(p.children.get(i).a < cur) {
+//                        cur = p.children.get(i).a;
+//                        p.choose = i;
+//                    }
+//                    if(p.parent != null && p.parent.update == true && p.parent.a >= cur) {
+//                        p.b = cur;
+//                        return; // a剪枝
+//                    }
+//                }
+//            }
+//        }
+//        if(p.parent != null) {
+//            if(p.parent.update == false) {
+//                p.parent.update = true;
+//                if(p.parent.type) {
+//                    p.parent.a = cur;
+//                } else {
+//                    p.parent.b = cur;
+//                }
+//            } else {
+//                if(p.parent.type) {
+//                    if(p.parent.a < cur)
+//                        p.parent.a = cur;
+//                } else {
+//                    if(p.parent.b > cur)
+//                        p.parent.b = cur;
+//                }
+//            }
+//        }
+//        if(p.type) {
+//            p.a = cur;
+//        } else {
+//            p.b = cur;
+//        }
+//    }
+
+    boolean game_over(int[] board) {
+        int count = 0;
+        for(int i = 0; i < board.length; i++) {
+            if(board[i] == 16 || board[i] == 32)
+                count++;
+        }
+        return count!=2;
+    }
+
+    void new_process(node p, int height) {
+        int[] data = str_to_vec(p.val);
+        if(height == 0)
             return;
+        if(game_over(data)) {
+            int value = evaluation(p.val);
+            if(p.type) {
+                p.a = value;
+            } else {
+                p.b = value;
+            }
+            return;
+        }
         int cur;
         if(p.type) // 当前是极大层
             cur = Integer.MIN_VALUE;
         else        // 当前是极小层
             cur = Integer.MAX_VALUE;
-        for(int i = 0; i < p.children.size(); i++) {
-            if(p.children.get(i).children.size() == 0) {
-                int value = evaluation(p.children.get(i).val);
-                if(p.type) { // 极大层
-                    if(value > cur) {
-                        cur = value;
-                        p.choose = i;
-                    }
-                    if(p.parent != null && p.parent.update == true && cur >= p.parent.b) {
-                        p.a = cur;
-                        return; // b剪枝
-                    }
-                } else { // 极小层
-                    if(value < cur) {
-                        cur = value;
-                        p.choose = i;
-                    }
-                    if(p.parent != null && p.parent.update == true && p.parent.a >= cur) {
-                        p.b = cur;
-                        return; // a减枝
-                    }
-                }
-            } else {
-                process(p.children.get(i));
-                if(p.type) { // 极大层
-                    if(p.children.get(i).b > cur) {
-                        cur = p.children.get(i).b;
-                        p.choose = i;
-                    }
-                    if(p.parent != null && p.parent.update == true && cur >= p.parent.b) {
-                        p.a = cur;
-                        return; // b剪枝
-                    }
-                } else { // 极小层
-                    if(p.children.get(i).a < cur) {
-                        cur = p.children.get(i).a;
-                        p.choose = i;
-                    }
-                    if(p.parent != null && p.parent.update == true && p.parent.a >= cur) {
-                        p.b = cur;
-                        return; // a剪枝
+        for(int i = 0; i < data.length; i++) {
+            if((p.type && data[i] > 16)||(!p.type && data[i] <= 16))
+                continue;
+            for(int j = 0; j < 90; j++) {
+                if(can_move(i, j, data, p.type)) {
+//                	if(i == 22 && j == 58 && height==3) {
+//                		m_print(data);
+//                	}
+                    int[] new_val = data.clone();
+                    new_val[j] = new_val[i];
+                    new_val[i] = 0;
+                    node child = new node(new_val, !p.type, p);
+                    int child_index = p.children.size();
+                    p.children.add(child);
+                    if(height == 1) {
+                        int value = evaluation(child.val);
+                        if(p.type) { // 极大层
+                            if(value > cur) {
+                                cur = value;
+                                p.choose = child_index;
+                            }
+                            if(p.parent != null && p.parent.update == true && cur >= p.parent.b) {
+                                p.a = cur;
+                                return; // b剪枝
+                            }
+                        } else { // 极小层
+                            if(value < cur) {
+                                cur = value;
+                                p.choose = child_index;
+                            }
+                            if(p.parent != null && p.parent.update == true && p.parent.a >= cur) {
+                                p.b = cur;
+                                return; // a减枝
+                            }
+                        }
+                    } else {
+                        new_process(child, height-1);
+                        if(p.type) { // 极大层
+                            if(child.b > cur) {
+                                cur = child.b;
+                                p.choose = child_index;
+                            }
+                            if(p.parent != null && p.parent.update == true && cur >= p.parent.b) {
+                                p.a = cur;
+                                return; // b剪枝
+                            }
+                        } else { // 极小层
+                            if(child.a < cur) {
+                                cur = child.a;
+                                p.choose = child_index;
+                            }
+                            if(p.parent != null && p.parent.update == true && p.parent.a >= cur) {
+                                p.b = cur;
+                                return; // a剪枝
+                            }
+                        }
                     }
                 }
             }
@@ -143,178 +271,315 @@ public class AI {
         }
     }
 
-    boolean game_over(int[] board) {
-        int count = 0;
-        for(int i = 0; i < board.length; i++) {
-            if(board[i] == 16 || board[i] == 32)
-                count++;
-        }
-        return count!=2;
-    }
+//    void init(node root, int height) {
+//        int[] data = str_to_vec(root.val);
+//        if(height == -1)
+//            return;
+//        if(game_over(data))
+//            return;
+//        for(int i = 0; i < data.length; i++) {
+//            if(data[i] < 17) {
+//                for(int j = 0; j < 90; j++) {
+//                    if(can_move(i, j, data)) {
+//                        int[] new_val = data.clone();
+//                        new_val[j] = new_val[i];
+//                        new_val[i] = 0;
+//                        node child = new node(new_val, !root.type, root);
+//                        root.children.add(child);
+//                        init(child, height-1);
+//                    }
+//                }
+//            }
+//        }
+//    }
 
-    void init(node root, int height) {
-        int[] data = str_to_vec(root.val);
-        if(height == -1)
-            return;
-        if(game_over(data))
-            return;
-        for(int i = 0; i < data.length; i++) {
-            if(data[i] < 17) {
-                for(int j = 0; j < 90; j++) {
-                    if(can_move(i, j, data)) {
-                        int[] new_val = data.clone();
-                        new_val[j] = new_val[i];
-                        new_val[i] = 0;
-                        node child = new node(new_val, !root.type, root);
-                        root.children.add(child);
-                        init(child, height-1);
+    boolean can_move(int from_index, int to_index, int[] board, boolean type) {
+        if(to_index < 0 || to_index > 89)
+            return false;
+        if(type) {
+            int from = board[from_index];
+            int to = board[to_index];
+            if(from_index == to_index)
+                return false;
+            if(from > 16 || from == 0) // 不能移动空白
+                return false; // AI移动黑方
+            if(to < 17 && to != 0)
+                return false; // 不能自残
+            // 兵
+            if((from == 11 || from == 12 || from == 13 || from == 14 || from == 15)){
+                if( to_index != from_index-1 && to_index != from_index+1 && to_index != from_index+9 ) // 不能后退
+                    return false;
+                if( from_index < 45 && (to_index == from_index-1 || to_index == from_index+1)) // 过河前不能左右移动
+                    return false;
+            }
+            // 车
+            if(from == 1 || from == 2) {
+                if(from_index/9 != to_index/9 && from_index%9 != to_index%9) // 只能横向或者纵向移动
+                    return false;
+                if(from_index/9 == to_index/9) { // 路径上不能有其他棋子
+                    if(from_index < to_index) {
+                        for(int i = from_index+1; i < to_index; i++)
+                            if(board[i] != 0)
+                                return false;
+                    } else {
+                        for(int i = from_index-1; i > to_index; i--)
+                            if(board[i] != 0)
+                                return false;
+                    }
+                } else {
+                    if(from_index < to_index) {
+                        for(int i = from_index+9; i < to_index; i+=9)
+                            if(board[i] != 0)
+                                return false;
+                    } else {
+                        for(int i = from_index-9; i > to_index; i-=9)
+                            if(board[i] != 0)
+                                return false;
                     }
                 }
             }
-        }
-    }
+            // 炮
+            if(from == 9 || from == 10) {
+                if(from_index/9 != to_index/9 && from_index%9 != to_index%9) // 只能横向或者纵向移动
+                    return false;
+                if(from_index/9 == to_index/9) {  // 移动路径中最多跨一个棋子
+                    int count = 0;
+                    if(from_index < to_index) {
+                        for(int i = from_index+1; i < to_index; i++)
+                            if(board[i] != 0)
+                                count++;
+                    } else {
+                        for(int i = from_index-1; i > to_index; i--)
+                            if(board[i] != 0)
+                                count++;
+                    }
+                    if(count > 1)
+                        return false;
+                    if(count == 0 && board[to_index] != 0) // 不跨子不能吃
+                        return false;
+                    if(count != 0 && board[to_index] == 0 ) // 不吃子不能跨
+                        return false;
+                } else {
+                    int count = 0;
+                    if(from_index < to_index) {
+                        for(int i = from_index+9; i < to_index; i+=9)
+                            if(board[i] != 0)
+                                count++;
+                    } else {
+                        for(int i = from_index-9; i > to_index; i-=9)
+                            if(board[i] != 0)
+                                count++;
+                    }
+                    if(count > 1)
+                        return false;
+                    if(count == 0 && board[to_index] != 0) // 不跨子不能吃
+                        return false;
+                    if(count != 0 && board[to_index] == 0 ) // 不吃子不能跨
+                        return false;
+                }
+            }
+            // 马
+            if(from == 3 || from == 4) {
+                // 走日字
+                if(to_index != from_index+1-18 && to_index != from_index+2-9 && to_index != from_index+2+9 && to_index != from_index+1+18
+                        && to_index != from_index-1-18 && to_index != from_index-2-9 && to_index != from_index-2+9 && to_index != from_index-1+18)
+                    return false;
+                // 卡马脚
+                if((to_index == from_index+1-18 && board[from_index-9] != 0) || (to_index == from_index+2-9 && board[from_index+1] != 0) ||
+                        (to_index == from_index+2+9 && board[from_index+1] != 0) || (to_index == from_index+1+18 && board[from_index+9] != 0) ||
+                        (to_index == from_index-1-18 && board[from_index-9] != 0) || (to_index == from_index-2-9 && board[from_index-1] != 0) ||
+                        (to_index == from_index-2+9 && board[from_index-1] != 0) || (to_index == from_index-1+18 && board[from_index+9] != 0)) {
+                    return false;
+                }
+            }
+            // 象
+            if(from == 5 || from == 6) {
+                // 不能过河
+                if(to_index > 44)
+                    return false;
+                // 走田字
+                if(to_index != from_index+2-18 && to_index != from_index+2+18 && to_index != from_index-2-18 && to_index != from_index-2+18)
+                    return false;
+                // 卡象脚
+                if((to_index == from_index+2-18 && board[from_index+1-9] != 0) || (to_index == from_index+2+18 && board[from_index+1+9] != 0) ||
+                        (to_index == from_index-2-18 && board[from_index-1-9] != 0) || (to_index == from_index-2+18 && board[from_index-1+9] != 0)) {
+                    return false;
+                }
+            }
+            // 士
+            if(from == 7 || from == 8) {
+                // 不能出王宫
+                if(to_index/9 > 2 || to_index%9 <3 || to_index%9 > 5)
+                    return false;
+                // 走对角
+                if(to_index != from_index+1-9 && to_index != from_index+1+9 && to_index != from_index-1-9 && to_index != from_index-1+9)
+                    return false;
+            }
+            // 帅
+            if(from == 16) {
+                // 不能出王宫
+                if(to_index/9 > 2 || to_index%9 <3 || to_index%9 > 5)
+                    return false;
+                // 走直线
+                if(to_index != from_index+1 && to_index != from_index-1 && to_index != from_index+9 && to_index != from_index-9)
+                    return false;
+                // 将帅不能直视
+                int i = 0;
+                for(i = 0; i < 90; i++)
+                    if(board[i] == 32)
+                        break;
+                if(i%9 == to_index%9) {
+                    int count = 0;
+                    for(int j = to_index+9; j < i; j+=9)
+                        if(board[j] != 0)
+                            count++;
+                    if(count==0)
+                        return false;
+                }
+            }
+            return true;
+        } else {
+            int from = board[from_index];
+            int to = board[to_index];
+            if(from < 17)
+                return false; // 只能移动红方
+            if(to >= 17)
+                return false; // 不能自残
+            // 兵
+            if((from == 27 || from == 28 || from == 29 || from == 30 || from == 31)){
+                if( to_index != from_index-1 && to_index != from_index+1 && to_index != from_index-9 ) // 不能后退
+                    return false;
+                if( from_index > 44 && (to_index == from_index-1 || to_index == from_index+1)) // 过河前不能左右移动
+                    return false;
+            }
+            // 车
+            if(from == 17 || from == 18) {
+                if(from_index/9 != to_index/9 && from_index%9 != to_index%9) // 只能横向或者纵向移动
+                    return false;
+                if(from_index/9 == to_index/9) { // 路径上不能有其他棋子
+                    if(from_index < to_index) {
+                        for(int i = from_index+1; i < to_index; i++)
+                            if(board[i] != 0)
+                                return false;
+                    } else {
+                        for(int i = from_index-1; i > to_index; i--)
+                            if(board[i] != 0)
+                                return false;
+                    }
+                } else {
+                    if(from_index < to_index) {
+                        for(int i = from_index+9; i < to_index; i+=9)
+                            if(board[i] != 0)
+                                return false;
+                    } else {
+                        for(int i = from_index-9; i > to_index; i-=9)
+                            if(board[i] != 0)
+                                return false;
+                    }
+                }
+            }
+            // 炮
+            if(from == 25 || from == 26) {
+                if(from_index/9 != to_index/9 && from_index%9 != to_index%9) // 只能横向或者纵向移动
+                    return false;
+                if(from_index/9 == to_index/9) {  // 移动路径中最多跨一个棋子
+                    int count = 0;
+                    if(from_index < to_index) {
+                        for(int i = from_index+1; i < to_index; i++)
+                            if(board[i] != 0)
+                                count++;
+                    } else {
+                        for(int i = from_index-1; i > to_index; i--)
+                            if(board[i] != 0)
+                                count++;
+                    }
+                    if(count > 1)
+                        return false;
+                    if(count == 0 && board[to_index] != 0) // 不跨子不能吃
+                        return false;
+                    if(count != 0 && board[to_index] == 0 ) // 不吃子不能跨
+                        return false;
 
-    boolean can_move(int from_index, int to_index, int[] board) {
-        int from = board[from_index];
-        int to = board[to_index];
-        if(from_index == to_index)
-            return false;
-        if(from > 16 || from == 0) // 不能移动空白
-            return false; // AI移动黑方
-        if(to < 17 && to != 0)
-            return false; // 不能自残
-        // 兵
-        if((from == 11 || from == 12 || from == 13 || from == 14 || from == 15)){
-            if( to_index != from_index-1 && to_index != from_index+1 && to_index != from_index+9 ) // 不能后退
-                return false;
-            if( from_index < 45 && (to_index == from_index-1 || to_index == from_index+1)) // 过河前不能左右移动
-                return false;
-        }
-        // 车
-        if(from == 1 || from == 2) {
-            if(from_index/9 != to_index/9 && from_index%9 != to_index%9) // 只能横向或者纵向移动
-                return false;
-            if(from_index/9 == to_index/9) { // 路径上不能有其他棋子
-                if(from_index < to_index) {
-                    for(int i = from_index+1; i < to_index; i++)
-                        if(board[i] != 0)
-                            return false;
                 } else {
-                    for(int i = from_index-1; i > to_index; i--)
-                        if(board[i] != 0)
-                            return false;
-                }
-            } else {
-                if(from_index < to_index) {
-                    for(int i = from_index+9; i < to_index; i+=9)
-                        if(board[i] != 0)
-                            return false;
-                } else {
-                    for(int i = from_index-9; i > to_index; i-=9)
-                        if(board[i] != 0)
-                            return false;
+                    int count = 0;
+                    if(from_index < to_index) {
+                        for(int i = from_index+9; i < to_index; i+=9)
+                            if(board[i] != 0)
+                                count++;
+                    } else {
+                        for(int i = from_index-9; i > to_index; i-=9)
+                            if(board[i] != 0)
+                                count++;
+                    }
+                    if(count > 1)
+                        return false;
+                    if(count == 0 && board[to_index] != 0) // 不跨子不能吃
+                        return false;
+                    if(count != 0 && board[to_index] == 0 ) // 不吃子不能跨
+                        return false;
                 }
             }
-        }
-        // 炮
-        if(from == 9 || from == 10) {
-            if(from_index/9 != to_index/9 && from_index%9 != to_index%9) // 只能横向或者纵向移动
-                return false;
-            if(from_index/9 == to_index/9) {  // 移动路径中最多跨一个棋子
-                int count = 0;
-                if(from_index < to_index) {
-                    for(int i = from_index+1; i < to_index; i++)
-                        if(board[i] != 0)
-                            count++;
-                } else {
-                    for(int i = from_index-1; i > to_index; i--)
-                        if(board[i] != 0)
-                            count++;
+            // 马
+            if(from == 19 || from == 20) {
+                // 走日字
+                if(to_index != from_index+1-18 && to_index != from_index+2-9 && to_index != from_index+2+9 && to_index != from_index+1+18
+                        && to_index != from_index-1-18 && to_index != from_index-2-9 && to_index != from_index-2+9 && to_index != from_index-1+18)
+                    return false;
+                // 卡马脚
+                if((to_index == from_index+1-18 && board[from_index-9] != 0) || (to_index == from_index+2-9 && board[from_index+1] != 0) ||
+                        (to_index == from_index+2+9 && board[from_index+1] != 0) || (to_index == from_index+1+18 && board[from_index+9] != 0) ||
+                        (to_index == from_index-1-18 && board[from_index-9] != 0) || (to_index == from_index-2-9 && board[from_index-1] != 0) ||
+                        (to_index == from_index-2+9 && board[from_index-1] != 0) || (to_index == from_index-1+18 && board[from_index+9] != 0)) {
+                    return false;
                 }
-                if(count > 1)
+            }
+            // 象
+            if(from == 21 || from == 22) {
+                // 不能过河
+                if(to_index < 45)
                     return false;
-                if(count == 0 && board[to_index] != 0) // 不跨子不能吃
+                // 走田字
+                if(to_index != from_index+2-18 && to_index != from_index+2+18 && to_index != from_index-2-18 && to_index != from_index-2+18)
                     return false;
-                if(count != 0 && board[to_index] == 0 ) // 不吃子不能跨
+                // 卡象脚
+                if((to_index == from_index+2-18 && board[from_index+1-9] != 0) || (to_index == from_index+2+18 && board[from_index+1+9] != 0) ||
+                        (to_index == from_index-2-18 && board[from_index-1-9] != 0) || (to_index == from_index-2+18 && board[from_index-1+9] != 0)) {
                     return false;
-            } else {
-                int count = 0;
-                if(from_index < to_index) {
-                    for(int i = from_index+9; i < to_index; i+=9)
-                        if(board[i] != 0)
-                            count++;
-                } else {
-                    for(int i = from_index-9; i > to_index; i-=9)
-                        if(board[i] != 0)
-                            count++;
                 }
-                if(count > 1)
-                    return false;
-                if(count == 0 && board[to_index] != 0) // 不跨子不能吃
-                    return false;
-                if(count != 0 && board[to_index] == 0 ) // 不吃子不能跨
-                    return false;
             }
-        }
-        // 马
-        if(from == 3 || from == 4) {
-            // 走日字
-            if(to_index != from_index+1-18 && to_index != from_index+2-9 && to_index != from_index+2+9 && to_index != from_index+1+18
-                    && to_index != from_index-1-18 && to_index != from_index-2-9 && to_index != from_index-2+9 && to_index != from_index-1+18)
-                return false;
-            // 卡马脚
-            if((to_index == from_index+1-18 && board[from_index-9] != 0) || (to_index == from_index+2-9 && board[from_index+1] != 0) ||
-                    (to_index == from_index+2+9 && board[from_index+1] != 0) || (to_index == from_index+1+18 && board[from_index+9] != 0) ||
-                    (to_index == from_index-1-18 && board[from_index-9] != 0) || (to_index == from_index-2-9 && board[from_index-1] != 0) ||
-                    (to_index == from_index-2+9 && board[from_index-1] != 0) || (to_index == from_index-1+18 && board[from_index+9] != 0)) {
-                return false;
-            }
-        }
-        // 象
-        if(from == 5 || from == 6) {
-            // 不能过河
-            if(to_index > 44)
-                return false;
-            // 走田字
-            if(to_index != from_index+2-18 && to_index != from_index+2+18 && to_index != from_index-2-18 && to_index != from_index-2+18)
-                return false;
-            // 卡象脚
-            if((to_index == from_index+2-18 && board[from_index+1-9] != 0) || (to_index == from_index+2+18 && board[from_index+1+9] != 0) ||
-                    (to_index == from_index-2-18 && board[from_index-1-9] != 0) || (to_index == from_index-2+18 && board[from_index-1+9] != 0)) {
-                return false;
-            }
-        }
-        // 士
-        if(from == 7 || from == 8) {
-            // 不能出王宫
-            if(to_index/9 > 2 || to_index%9 <3 || to_index%9 > 5)
-                return false;
-            // 走对角
-            if(to_index != from_index+1-9 && to_index != from_index+1+9 && to_index != from_index-1-9 && to_index != from_index-1+9)
-                return false;
-        }
-        // 帅
-        if(from == 16) {
-            // 不能出王宫
-            if(to_index/9 > 2 || to_index%9 <3 || to_index%9 > 5)
-                return false;
-            // 走直线
-            if(to_index != from_index+1 && to_index != from_index-1 && to_index != from_index+9 && to_index != from_index-9)
-                return false;
-            // 将帅不能直视
-            int i = 0;
-            for(i = 0; i < 90; i++)
-                if(board[i] == 32)
-                    break;
-            if(i%9 == to_index%9) {
-                int count = 0;
-                for(int j = to_index+9; j < i; j+=9)
-                    if(board[j] != 0)
-                        count++;
-                if(count==0)
+            // 士
+            if(from == 23 || from == 24) {
+                // 不能出王宫
+                if(to_index/9 < 7 || to_index%9 <3 || to_index%9 > 5)
+                    return false;
+                // 走对角
+                if(to_index != from_index+1-9 && to_index != from_index+1+9 && to_index != from_index-1-9 && to_index != from_index-1+9)
                     return false;
             }
+            // 帅
+            if(from == 32) {
+                // 不能出王宫
+                if(to_index/9 < 7 || to_index%9 <3 || to_index%9 > 5)
+                    return false;
+                // 走直线
+                if(to_index != from_index+1 && to_index != from_index-1 && to_index != from_index+9 && to_index != from_index-9)
+                    return false;
+                // 将帅不能直视
+                int i = 0;
+                for(i = 0; i < 90; i++)
+                    if(board[i] == 16)
+                        break;
+                if(i%9 == to_index%9) {
+                    int count = 0;
+                    for(int j = to_index-9; j > i; j-=9)
+                        if(board[j] != 0)
+                            count++;
+                    if(count==0)
+                        return false;
+                }
+            }
+            return true;
         }
-        return true;
     }
 }
+
