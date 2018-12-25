@@ -57,64 +57,55 @@
             android:id="@+id/p00"
             android:layout_marginLeft="0dp"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_c"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p01"
             app:layout_constraintLeft_toRightOf="@id/p00"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_m"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p02"
             app:layout_constraintLeft_toRightOf="@id/p01"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_x"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p03"
             app:layout_constraintLeft_toRightOf="@id/p02"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_s"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p04"
             app:layout_constraintLeft_toRightOf="@id/p03"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_j"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p05"
             app:layout_constraintLeft_toRightOf="@id/p04"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_s"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p06"
             app:layout_constraintLeft_toRightOf="@id/p05"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_x"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p07"
             app:layout_constraintLeft_toRightOf="@id/p06"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_m"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p08"
             app:layout_constraintLeft_toRightOf="@id/p07"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_c"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p10"
@@ -191,8 +182,7 @@
             app:layout_constraintTop_toBottomOf="@+id/p10"
             app:layout_constraintLeft_toRightOf="@id/p20"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_p"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p22"
@@ -234,8 +224,7 @@
             app:layout_constraintTop_toBottomOf="@+id/p10"
             app:layout_constraintLeft_toRightOf="@id/p26"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_p"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p28"
@@ -249,8 +238,7 @@
             app:layout_constraintTop_toBottomOf="@+id/p20"
             android:layout_marginLeft="0dp"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_z"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p31"
@@ -264,8 +252,7 @@
             app:layout_constraintTop_toBottomOf="@+id/p20"
             app:layout_constraintLeft_toRightOf="@id/p31"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_z"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p33"
@@ -279,8 +266,7 @@
             app:layout_constraintTop_toBottomOf="@+id/p20"
             app:layout_constraintLeft_toRightOf="@id/p33"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_z"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p35"
@@ -294,8 +280,7 @@
             app:layout_constraintTop_toBottomOf="@+id/p20"
             app:layout_constraintLeft_toRightOf="@id/p35"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_z"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p37"
@@ -310,8 +295,7 @@
             app:layout_constraintLeft_toRightOf="@id/p37"
             android:layout_marginLeft="0dp"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/b_z"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p40"
@@ -444,8 +428,7 @@
             app:layout_constraintTop_toBottomOf="@+id/p50"
             android:layout_marginLeft="0dp"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_z"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p61"
@@ -459,8 +442,7 @@
             app:layout_constraintTop_toBottomOf="@+id/p50"
             app:layout_constraintLeft_toRightOf="@id/p61"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_z"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p63"
@@ -474,8 +456,7 @@
             app:layout_constraintTop_toBottomOf="@+id/p50"
             app:layout_constraintLeft_toRightOf="@id/p63"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_z"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p65"
@@ -489,8 +470,7 @@
             app:layout_constraintTop_toBottomOf="@+id/p50"
             app:layout_constraintLeft_toRightOf="@id/p65"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_z"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p67"
@@ -504,8 +484,7 @@
             app:layout_constraintTop_toBottomOf="@+id/p50"
             app:layout_constraintLeft_toRightOf="@id/p67"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_z"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p70"
@@ -519,8 +498,7 @@
             app:layout_constraintTop_toBottomOf="@+id/p60"
             app:layout_constraintLeft_toRightOf="@id/p70"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_p"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p72"
@@ -562,8 +540,7 @@
             app:layout_constraintTop_toBottomOf="@+id/p60"
             app:layout_constraintLeft_toRightOf="@id/p76"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_p"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p78"
@@ -640,72 +617,63 @@
             app:layout_constraintTop_toBottomOf="@+id/p80"
             android:layout_marginLeft="0dp"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_c"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p91"
             app:layout_constraintTop_toBottomOf="@+id/p80"
             app:layout_constraintLeft_toRightOf="@id/p90"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_m"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p92"
             app:layout_constraintTop_toBottomOf="@+id/p80"
             app:layout_constraintLeft_toRightOf="@id/p91"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_x"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p93"
             app:layout_constraintTop_toBottomOf="@+id/p80"
             app:layout_constraintLeft_toRightOf="@id/p92"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_s"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p94"
             app:layout_constraintTop_toBottomOf="@+id/p80"
             app:layout_constraintLeft_toRightOf="@id/p93"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_j"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p95"
             app:layout_constraintTop_toBottomOf="@+id/p80"
             app:layout_constraintLeft_toRightOf="@id/p94"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_s"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p96"
             app:layout_constraintTop_toBottomOf="@+id/p80"
             app:layout_constraintLeft_toRightOf="@id/p95"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_x"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p97"
             app:layout_constraintTop_toBottomOf="@+id/p80"
             app:layout_constraintLeft_toRightOf="@id/p96"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_m"/>
+            android:layout_height="30dp"/>
         <ImageView
             android:onClick="click_chess"
             android:id="@+id/p98"
             app:layout_constraintTop_toBottomOf="@+id/p80"
             app:layout_constraintLeft_toRightOf="@id/p97"
             android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/r_c"/>
+            android:layout_height="30dp"/>
     </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

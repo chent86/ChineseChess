@@ -15,7 +15,4 @@ public class node {
         this.type = type;
         this.parent = parent;
     }
-    void update(int ex) {
-        this.ex = ex;
-    }
 }
