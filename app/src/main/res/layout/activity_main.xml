@@ -5,7 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+    <TextView
+        android:id="@+id/spent_time"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/board"
+        app:layout_constraintRight_toRightOf="@id/board"
+        app:layout_constraintBottom_toTopOf="@id/action_set"
+        android:text="AI用时: "
+        android:textAlignment="center"
+        android:textSize="20sp"/>
     <LinearLayout
+        android:id="@+id/action_set"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"

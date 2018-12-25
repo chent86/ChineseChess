@@ -30,8 +30,7 @@ public class AI {
         return result;
     }
     // a-b剪枝
-    public node a_b(int[] cur) {
-        int height = 3;
+    public node a_b(int[] cur, int height) {;
         node root = new node(cur, true, null);
         new_process(root, height-1);
         return root;
@@ -76,6 +75,52 @@ public class AI {
         return count!=2;
     }
 
+//    int[] get_all_pos(int index, int chess) {
+//        // 车
+//        if(chess == 1 || chess == 2 || chess == 17 || chess == 18) {
+//            int[] result = {index-1, index-2, index-3, index-4, index-5, index-6, index-7, index-8,
+//                    index+1, index+2, index+3, index+4, index+5, index+6, index+7, index+8,
+//                    index-9, index-18, index-27, index-36, index-45, index-54, index-63, index-72, index-81,
+//                    index+9, index+18, index+27, index+36, index+45, index+54, index+63, index+72, index+81};
+//            return result;
+//        }
+//        // 马
+//        if(chess == 3 || chess == 4 || chess == 19 || chess == 20) {
+//            int[] result = {index+1-18, index+2-9, index+2+9, index+1+18,
+//                    index-1+18, index-2+9, index-2-9, index-1-18};
+//            return result;
+//        }
+//        // 象
+//        if(chess == 5 || chess == 6 || chess == 21 || chess == 22) {
+//            int[] result = {index+2-18, index+2+18, index-2-18, index-2+18};
+//            return result;
+//        }
+//        // 士
+//        if(chess == 7 || chess == 8 || chess == 23 || chess == 24) {
+//            int[] result = {index+1-9, index+1+9, index-1-9, index-1+9};
+//            return result;
+//        }
+//        // 将
+//        if(chess == 16 || chess == 32) {
+//            int[] result = {index+1, index-1, index-9, index+9};
+//            return result;
+//        }
+//        // 炮
+//        if(chess == 9 || chess == 10 || chess == 25 || chess == 26) {
+//            int[] result = {index-1, index-2, index-3, index-4, index-5, index-6, index-7, index-8,
+//                    index+1, index+2, index+3, index+4, index+5, index+6, index+7, index+8,
+//                    index-9, index-18, index-27, index-36, index-45, index-54, index-63, index-72, index-81,
+//                    index+9, index+18, index+27, index+36, index+45, index+54, index+63, index+72, index+81};
+//            return result;
+//        }
+//        // 兵
+//        if(chess == 11 || chess == 12 || chess == 13 || chess == 14 || chess == 15 || chess == 27 || chess == 28 || chess == 29 || chess == 30 || chess == 31) {
+//            int[] result = {index+1, index-1, index-9, index+9};
+//            return result;
+//        }
+//        return null;
+//    }
+
     void new_process(node p, int height) {
 //    	List<Thread> thread_pool = new ArrayList<>();
         int[] data = str_to_vec(p.val);
@@ -96,9 +141,12 @@ public class AI {
         else        // 当前是极小层
             cur = Integer.MAX_VALUE;
         for(int i = 0; i < data.length; i++) {
-            if((p.type && data[i] > 16)||(!p.type && data[i] <= 16))
+            if((data[i] == 0)||(p.type && data[i] > 16)||(!p.type && data[i] <= 16))
                 continue;
+//            int[] possible_move = get_all_pos(i, data[i]).clone();
             for(int j = 0; j < 90; j++) {
+                if((p.type && data[j] <= 16 && data[j] != 0)||(!p.type && data[j] > 16))
+                    continue;
                 if(can_move(i, j, data, p.type)) {
                     int[] new_val = data.clone();
                     new_val[j] = new_val[i];

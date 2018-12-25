@@ -14,7 +14,9 @@ import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     boolean over = false;
     Subscriber subscriber;
     AI m_AI = new AI();
+    int last_time;
     void set_info() {
         TextView tv = findViewById(R.id.info);
         if(my_turn) {
@@ -43,31 +46,31 @@ public class MainActivity extends AppCompatActivity {
             result[i] = Integer.parseInt(s[i]);
         return result;
     }
-//    private int[] board = {
-//            1, 3, 5, 7,16, 8, 6, 4, 2,
-//            0, 0, 0, 0, 0, 0, 0, 0, 0,
-//            0, 9, 0, 0, 0, 0, 0,10, 0,
-//            11, 0,12, 0,13, 0,14, 0,15,
-//            0, 0, 0, 0, 0, 0, 0, 0, 0,
-//            0, 0, 0, 0, 0, 0, 0, 0, 0,
-//            27, 0,28, 0,29, 0,30, 0,31,
-//            0,25, 0, 0, 0, 0, 0,26, 0,
-//            0, 0, 0, 0, 0, 0, 0, 0, 0,
-//            17,19,21,23,32,24,22,20,18
-//    };
-private int[] board = {
-	       0, 0, 5, 7,16, 8, 6, 0, 2,
-	       0, 0, 0, 1, 0, 0, 0, 0, 0,
-	       9, 0, 3, 0, 0, 0, 4,10, 0,
-	       11, 0,12, 0,0, 0,14, 0,15,
-	       0, 0, 0, 0, 0, 0, 0, 0, 0,
-	       0, 0, 0, 0, 25, 0, 0, 26, 0,
-	       27, 0,28, 0,29, 0,30, 0,31,
-	       0,0, 19, 0, 0, 0, 0,0, 0,
-	       0, 0, 0, 0, 0, 0, 0, 0, 0,
-	       0,17,21,23,32,24,22,20,18
-
-};
+    private int[] board = {
+            1, 3, 5, 7,16, 8, 6, 4, 2,
+            0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 9, 0, 0, 0, 0, 0,10, 0,
+            11, 0,12, 0,13, 0,14, 0,15,
+            0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0,
+            27, 0,28, 0,29, 0,30, 0,31,
+            0,25, 0, 0, 0, 0, 0,26, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0,
+            17,19,21,23,32,24,22,20,18
+    };
+//private int[] board = {
+//	       0, 0, 5, 7,16, 8, 6, 0, 2,
+//	       0, 0, 0, 1, 0, 0, 0, 0, 0,
+//	       9, 0, 3, 0, 0, 0, 4,10, 0,
+//	       11, 0,12, 0,0, 0,14, 0,15,
+//	       0, 0, 0, 0, 0, 0, 0, 0, 0,
+//	       0, 0, 0, 0, 25, 0, 0, 26, 0,
+//	       27, 0,28, 0,29, 0,30, 0,31,
+//	       0,0, 19, 0, 0, 0, 0,0, 0,
+//	       0, 0, 0, 0, 0, 0, 0, 0, 0,
+//	       0,17,21,23,32,24,22,20,18
+//
+//};
     int[] AI_result;
     void init_board() {
         ConstraintLayout c = findViewById(R.id.board);
@@ -123,6 +126,10 @@ private int[] board = {
         subscriber = new Subscriber<String>() {
             @Override
             public void onNext(String s) {
+                Calendar calendar = Calendar.getInstance();
+                int spent = calendar.get(Calendar.SECOND)-last_time;
+                TextView tv = findViewById(R.id.spent_time);
+                tv.setText("AI用时: "+spent+"s");
                 int from_index = 0, to_index = 0;
                 for(int i = 0; i < AI_result.length; i++) {
                     if(AI_result[i] != board[i]) {
@@ -415,10 +422,20 @@ private int[] board = {
                     game_over(board);
                     if(over)
                         return;
+                    Calendar calendar = Calendar.getInstance();
+                    last_time = calendar.get(Calendar.SECOND);
                     Observable observable = Observable.create(new Observable.OnSubscribe<String>() {
                         @Override
                         public void call(final Subscriber<? super String> subscriber) {
-                            node root =m_AI.a_b(board);
+                            int count = 0;
+                            for(int i = 0; i < 90; i++)
+                                if(board[i] != 0)
+                                    count++;
+                            node root = null;
+//                            if(count%2 != 0 )
+//                                root =m_AI.a_b(board, 4);
+//                            else
+                                root =m_AI.a_b(board, 3);
                             AI_result = str_to_vec(root.choose).clone();
                             subscriber.onNext("OK");
                         }
