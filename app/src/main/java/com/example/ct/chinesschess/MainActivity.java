@@ -7,14 +7,42 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
     boolean my_turn = true;
     int last_click = -1;
+    boolean over = false;
+    Subscriber subscriber;
+    AI m_AI = new AI();
+    void set_info() {
+        TextView tv = findViewById(R.id.info);
+        if(my_turn) {
+            tv.setVisibility(View.VISIBLE);
+        } else {
+            tv.setVisibility(View.INVISIBLE);
+        }
+
+    }
+    static int[] str_to_vec(String str) {
+        int[] result = new int[90];
+        String[] s = str.split("\\.");
+        for(int i = 0; i <90; i++)
+            result[i] = Integer.parseInt(s[i]);
+        return result;
+    }
     private int[] board = {
             1, 3, 5, 7,16, 8, 6, 4, 2,
             0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -27,10 +55,47 @@ public class MainActivity extends AppCompatActivity {
             0, 0, 0, 0, 0, 0, 0, 0, 0,
             17,19,21,23,32,24,22,20,18
     };
+    int[] AI_result;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        subscriber = new Subscriber<String>() {
+            @Override
+            public void onNext(String s) {
+                int from_index = 0, to_index = 0;
+                for(int i = 0; i < AI_result.length; i++) {
+                    if(AI_result[i] != board[i]) {
+                        if(AI_result[i] == 0 && board[i] != 0){
+                            from_index = i;
+                        } else {
+                            to_index = i;
+                        }
+                    }
+                }
+                ConstraintLayout c = findViewById(R.id.board);
+                ImageView from = (ImageView) c.getChildAt(from_index);
+                Drawable from_img = from.getBackground();
+                c.getChildAt(from_index).setBackground(null);
+                c.getChildAt(to_index).setBackground(from_img);
+                board[to_index] = board[from_index];
+                board[from_index] = 0;
+                my_turn = true;
+                set_info();
+                game_over(board);
+            }
+
+            @Override
+            public void onCompleted() {
+//                Log.d(tag, "Completed!");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+//                Log.d(tag, "Error!");
+            }
+        };
     }
     boolean can_move(int from_index, int to_index) {
         int from = board[from_index];
@@ -157,8 +222,28 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+   void game_over(int[] board) {
+        boolean win = true;
+        boolean lose = true;
+        for(int i = 0; i < board.length; i++) {
+            if(board[i] == 16)
+                win=false;
+            if(board[i] == 32)
+                lose=false;
+        }
+        if(win) {
+            over = true;
+            Toast.makeText(getApplicationContext(), "You win!", Toast.LENGTH_SHORT).show();
+        }
+        if(lose) {
+            over = true;
+            Toast.makeText(getApplicationContext(), "You lose!", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
     void click_chess(View view) {
-        if(my_turn) {
+        if(my_turn && !over) {
             ConstraintLayout c = (ConstraintLayout)view.getParent();
             int id = c.indexOfChild(view);
             if(last_click == -1) {
@@ -182,6 +267,24 @@ public class MainActivity extends AppCompatActivity {
                     board[last_click] = 0;
                     set_choose(null);
                     last_click = -1;
+                    my_turn = false;
+                    set_info();
+
+                    game_over(board);
+                    if(over)
+                        return;
+                    Observable observable = Observable.create(new Observable.OnSubscribe<String>() {
+                        @Override
+                        public void call(final Subscriber<? super String> subscriber) {
+                            node root =m_AI.a_b(board);
+                            AI_result = str_to_vec(root.children.get(root.choose).val).clone();
+                            subscriber.onNext("OK");
+                        }
+                    });
+                    observable.subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(subscriber);
+
                 }
             }
         }

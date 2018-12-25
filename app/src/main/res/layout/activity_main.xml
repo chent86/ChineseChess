@@ -5,6 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+    <TextView
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/board"
+        app:layout_constraintRight_toRightOf="@id/board"
+        android:text="你的回合!"
+        app:layout_constraintBottom_toTopOf="@id/board"
+        android:textSize="30sp"/>
     <ImageView
         android:id="@+id/choose"
         android:layout_width="33dp"
