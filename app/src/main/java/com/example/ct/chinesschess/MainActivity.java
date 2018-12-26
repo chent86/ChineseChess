@@ -50,10 +50,10 @@ public class MainActivity extends AppCompatActivity {
 
     // 悔棋
     void oh_no(View view) {
-        if(!my_turn) {
-            Toast.makeText( getApplicationContext(), "这不是你的回合", Toast.LENGTH_SHORT).show();
-            return;
-        }
+//        if(!my_turn) {
+//            Toast.makeText( getApplicationContext(), "这不是你的回合", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
         if(record.size() > 1) {
             board = record.get(record.size()-2);
             record.remove(record.size()-1);
