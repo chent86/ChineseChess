@@ -475,7 +475,7 @@ public class MainActivity extends AppCompatActivity {
     }
     void send_chess() {
         try {
-            String baseUrl = "http://192.168.199.229:8099";
+            String baseUrl = "http://119.29.204.118:8099";
             //合成参数
             StringBuilder tempParams = new StringBuilder();
             int pos = 0;

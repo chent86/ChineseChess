@@ -23,7 +23,7 @@
         app:layout_constraintBottom_toTopOf="@id/action_set"
         android:text="AI用时: "
         android:textAlignment="center"
-        android:visibility="invisible"
+        android:visibility="visible"
         android:textSize="20sp"/>
     <LinearLayout
         android:id="@+id/action_set"
