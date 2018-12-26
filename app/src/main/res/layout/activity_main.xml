@@ -5,6 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/back"
+        android:onClick="back"/>
     <TextView
         android:id="@+id/spent_time"
         android:layout_width="150dp"
@@ -14,16 +23,17 @@
         app:layout_constraintBottom_toTopOf="@id/action_set"
         android:text="AI用时: "
         android:textAlignment="center"
+        android:visibility="invisible"
         android:textSize="20sp"/>
     <LinearLayout
         android:id="@+id/action_set"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         app:layout_constraintLeft_toLeftOf="@id/board"
-        app:layout_constraintRight_toRightOf="@id/board"
         app:layout_constraintBottom_toTopOf="@id/info"
-        android:layout_marginBottom="10dp">
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="60dp">
         <TextView
             android:id="@+id/AI_action"
             android:layout_width="100dp"
@@ -37,14 +47,34 @@
             android:text="玩家:"
             android:textSize="20sp"/>
     </LinearLayout>
-    <TextView
-        android:id="@+id/info"
+    <Button
+        android:id="@+id/bt3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="悔棋"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="@id/action_set"
+        app:layout_constraintTop_toTopOf="@id/action_set"
+        app:layout_constraintBottom_toBottomOf="@id/action_set"
+        android:onClick="oh_no"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="重新开始"
+        android:textSize="20sp"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintLeft_toRightOf="@id/bt3"
+        app:layout_constraintTop_toTopOf="@id/action_set"
+        app:layout_constraintBottom_toBottomOf="@id/action_set"
+        android:onClick="restart"/>
+    <ImageView
+        android:id="@+id/info"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
         app:layout_constraintLeft_toLeftOf="@id/board"
         app:layout_constraintRight_toRightOf="@id/board"
-        android:text="你的回合!"
         app:layout_constraintBottom_toTopOf="@id/board"
+        android:src="@drawable/info"
         android:textSize="30sp"/>
     <ImageView
         android:id="@+id/choose"

@@ -1,7 +1,9 @@
 package com.example.ct.chinesschess;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +19,8 @@ import org.w3c.dom.Text;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.List;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -31,8 +35,38 @@ public class MainActivity extends AppCompatActivity {
     AI m_AI = new AI();
     int last_time;
     int last_min;
+    int mode = 0;
+
+    // 悔棋
+    void oh_no(View view) {
+        if(!my_turn) {
+            Toast.makeText( getApplicationContext(), "这不是你的回合", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(record.size() > 1) {
+            board = record.get(record.size()-2);
+            record.remove(record.size()-1);
+            init_board();
+        } else {
+            Toast.makeText( getApplicationContext(), "您还没有落子", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    void restart(View view) {
+        if(!my_turn) {
+            Toast.makeText( getApplicationContext(), "这不是你的回合", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(record.size()>1) {
+            board = first_board.clone();
+            init_board();
+        } else {
+            Toast.makeText( getApplicationContext(), "您还没有落子", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     void set_info() {
-        TextView tv = findViewById(R.id.info);
+        ImageView tv = findViewById(R.id.info);
         if(my_turn) {
             tv.setVisibility(View.VISIBLE);
         } else {
@@ -59,6 +93,19 @@ public class MainActivity extends AppCompatActivity {
             0, 0, 0, 0, 0, 0, 0, 0, 0,
             17,19,21,23,32,24,22,20,18
     };
+    private int[] first_board = {
+            1, 3, 5, 7,16, 8, 6, 4, 2,
+            0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 9, 0, 0, 0, 0, 0,10, 0,
+            11, 0,12, 0,13, 0,14, 0,15,
+            0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0,
+            27, 0,28, 0,29, 0,30, 0,31,
+            0,25, 0, 0, 0, 0, 0,26, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0,
+            17,19,21,23,32,24,22,20,18
+    };
+    List<int[]> record = new ArrayList<>();
 //private int[] board = {
 //        1, 0, 5, 7, 16, 8, 6, 4, 2,
 //        0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -116,11 +163,17 @@ public class MainActivity extends AppCompatActivity {
                 c.getChildAt(i).setBackground(null);
         }
     }
+
+    void back(View view) {
+        this.finish();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        record.add(board.clone());
+        Intent intent = getIntent();
+        mode = (int)intent.getSerializableExtra("mode");
 
         init_board();
         subscriber = new Subscriber<String>() {
@@ -143,13 +196,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 update_action(from_index);
-                ConstraintLayout c = findViewById(R.id.board);
-                ImageView from = (ImageView) c.getChildAt(from_index);
-                Drawable from_img = from.getBackground();
-                c.getChildAt(from_index).setBackground(null);
-                c.getChildAt(to_index).setBackground(from_img);
                 board[to_index] = board[from_index];
                 board[from_index] = 0;
+                init_board();
+                record.add(board.clone());
                 my_turn = true;
                 set_info();
                 game_over(board);
@@ -451,10 +501,15 @@ public class MainActivity extends AppCompatActivity {
                                 if(board[i] != 0)
                                     count++;
                             node root = null;
-                            if(double_pao())
-                                root =m_AI.a_b(board, 4);
-                            else
-                                root =m_AI.a_b(board, 3);
+                            if(mode == 0) {
+                                root =m_AI.a_b(board, 2);
+                            } else {
+                                if(double_pao())
+                                    root =m_AI.a_b(board, 4);
+                                else
+                                    root =m_AI.a_b(board, 3);
+                            }
+
                             AI_result = str_to_vec(root.choose).clone();
                             subscriber.onNext("OK");
                         }
