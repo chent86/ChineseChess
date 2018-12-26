@@ -7,6 +7,7 @@ import android.media.Image;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -16,6 +17,16 @@ import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -204,12 +215,10 @@ public class MainActivity extends AppCompatActivity {
                 set_info();
                 game_over(board);
             }
-
             @Override
             public void onCompleted() {
 //                Log.d(tag, "Completed!");
             }
-
             @Override
             public void onError(Throwable e) {
 //                Log.d(tag, "Error!");
@@ -458,6 +467,77 @@ public class MainActivity extends AppCompatActivity {
         return (pao_1%9==pao_2%9&& pao_1%9==king%9)||(pao_1/9 == pao_2/9 && pao_1/9==king/9);
     }
 
+    String vec_to_str(int[] v) {
+        String result = "";
+        for(int i = 0; i < v.length; i++)
+            result = result + v[i] + ".";
+        return result;
+    }
+    void send_chess() {
+        try {
+            String baseUrl = "http://192.168.199.229:8099";
+            //合成参数
+            StringBuilder tempParams = new StringBuilder();
+            int pos = 0;
+            tempParams.append("\""+mode+"chess:"+vec_to_str(board)+"\"");
+            String params =tempParams.toString();
+            // 请求的参数转换为byte数组
+            byte[] postData = params.getBytes();
+            // 新建一个URL对象
+            URL url = new URL(baseUrl);
+            // 打开一个HttpURLConnection连接
+            HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
+            // Post请求必须设置允许输出 默认false
+            urlConn.setDoOutput(true);
+            //设置请求允许输入 默认是true
+            urlConn.setDoInput(true);
+            // Post请求不能使用缓存
+            urlConn.setUseCaches(false);
+            // 设置为Post请求
+            urlConn.setRequestMethod("POST");
+            //设置本次连接是否自动处理重定向
+            urlConn.setInstanceFollowRedirects(true);
+            // 配置请求Content-Type
+            urlConn.setRequestProperty("Content-Type", "application/text");
+            // 开始连接
+            urlConn.connect();
+            // 发送请求参数
+            DataOutputStream dos = new DataOutputStream(urlConn.getOutputStream());
+            dos.write(postData);
+            dos.flush();
+            dos.close();
+            // 判断请求是否成功
+            if (urlConn.getResponseCode() == 200) {
+                // 获取返回的数据
+                StringBuilder sb = new StringBuilder();
+                BufferedReader rd = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+                String line;
+                while ((line = rd.readLine()) != null) {
+                    sb.append(line);
+                }
+                String result = sb.toString();
+                AI_result = str_to_vec(result).clone();
+
+                Observable observable = Observable.create(new Observable.OnSubscribe<String>() {
+                        @Override
+                        public void call(final Subscriber<? super String> subscriber) {
+                            subscriber.onNext("OK");
+                        }
+                    });
+                    observable.subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(subscriber);
+                Log.e("ok", "Post方式请求成功，result--->" + result);
+            } else {
+                Log.e("err", "Post方式请求失败");
+            }
+            // 关闭连接
+            urlConn.disconnect();
+        } catch (Exception e) {
+            Log.e("err", e.toString());
+        }
+    }
+
     void click_chess(View view) {
         if(my_turn && !over) {
             ConstraintLayout c = (ConstraintLayout)view.getParent();
@@ -493,30 +573,15 @@ public class MainActivity extends AppCompatActivity {
                     Calendar calendar = Calendar.getInstance();
                     last_time = calendar.get(Calendar.SECOND);
                     last_min = calendar.get(Calendar.MINUTE);
-                    Observable observable = Observable.create(new Observable.OnSubscribe<String>() {
-                        @Override
-                        public void call(final Subscriber<? super String> subscriber) {
-                            int count = 0;
-                            for(int i = 0; i < 90; i++)
-                                if(board[i] != 0)
-                                    count++;
-                            node root = null;
-                            if(mode == 0) {
-                                root =m_AI.a_b(board, 2);
-                            } else {
-                                if(double_pao())
-                                    root =m_AI.a_b(board, 4);
-                                else
-                                    root =m_AI.a_b(board, 3);
-                            }
 
-                            AI_result = str_to_vec(root.choose).clone();
-                            subscriber.onNext("OK");
+                    Thread thread=new Thread(new Runnable()
+                    {
+                        @Override
+                        public void run() {
+                            send_chess();
                         }
                     });
-                    observable.subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(subscriber);
+                    thread.start();
                 }
             }
         }
