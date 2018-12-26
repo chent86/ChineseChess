@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     Subscriber subscriber;
     AI m_AI = new AI();
     int last_time;
+    int last_min;
     void set_info() {
         TextView tv = findViewById(R.id.info);
         if(my_turn) {
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 //        1, 0, 5, 7, 16, 8, 6, 4, 2,
 //        0, 0, 0, 0, 0, 0, 0, 0, 0,
 //        0, 0, 3, 0, 0, 0, 0, 10, 0,
-//        11, 0, 12, 0, 25, 0, 14, 0, 15,
+//        11, 0, 12, 0, 0, 0, 14, 0, 15,
 //        0, 0, 0, 0, 0, 0, 0, 0, 0,
 //        0, 0, 0, 0, 0, 0, 0, 0, 0,
 //        27, 0, 28, 9, 0, 0, 30, 0, 31,
@@ -127,6 +128,8 @@ public class MainActivity extends AppCompatActivity {
             public void onNext(String s) {
                 Calendar calendar = Calendar.getInstance();
                 int spent = calendar.get(Calendar.SECOND)-last_time;
+                int min = calendar.get(Calendar.MINUTE)-last_min;
+                spent += min*60;
                 TextView tv = findViewById(R.id.spent_time);
                 tv.setText("AI用时: "+spent+"s");
                 int from_index = 0, to_index = 0;
@@ -223,148 +226,152 @@ public class MainActivity extends AppCompatActivity {
             return false; // 只能移动红方
         if(to >= 17)
             return false; // 不能自残
-        // 兵
-        if(from >= 27 && from <= 31){
-            if( from_index > 44 && from_y == to_y && (to_x == from_x-1 || to_x == from_x+1)) // 过河前不能左右移动
-                return false;
-            if(!(from_y == to_y && from_x == to_x-1)&&!(from_y == to_y && from_x == to_x+1)&&!(from_x==to_x && to_y==from_y-1))
-                return false; // 不能后退
-        }
-        // 车
-        if(from == 17 || from == 18) {
-            if(from_x != to_x && from_y != to_y) // 只能横向或者纵向移动
-                return false;
-            if(from_y == to_y) { // 路径上不能有其他棋子
-                if(from_index < to_index) {
-                    for(int i = from_index+1; i < to_index; i++)
-                        if(board[i] != 0)
-                            return false;
+        switch(from) {
+            case 17:case 18: // 车
+                if(from_x != to_x && from_y != to_y) // 只能横向或者纵向移动
+                    return false;
+                if(from_y == to_y) { // 路径上不能有其他棋子
+                    if(from_index < to_index) {
+                        for(int i = from_index+1; i < to_index; i++)
+                            if(board[i] != 0)
+                                return false;
+                    } else {
+                        for(int i = from_index-1; i > to_index; i--)
+                            if(board[i] != 0)
+                                return false;
+                    }
                 } else {
-                    for(int i = from_index-1; i > to_index; i--)
-                        if(board[i] != 0)
-                            return false;
+                    if(from_index < to_index) {
+                        for(int i = from_index+9; i < to_index; i+=9)
+                            if(board[i] != 0)
+                                return false;
+                    } else {
+                        for(int i = from_index-9; i > to_index; i-=9)
+                            if(board[i] != 0)
+                                return false;
+                    }
                 }
-            } else {
-                if(from_index < to_index) {
-                    for(int i = from_index+9; i < to_index; i+=9)
-                        if(board[i] != 0)
-                            return false;
+                break;
+            case 19:case 20: // 马
+                // 走日字
+                if(!(to_x == from_x+1 && to_y == from_y-2)&&!(to_x == from_x+2 && to_y == from_y-1)&&
+                        !(to_x == from_x+2 && to_y == from_y+1)&&!(to_x == from_x+1 && to_y == from_y+2)&&
+                        !(to_x == from_x-1 && to_y == from_y+2)&&!(to_x == from_x-2 && to_y == from_y+1)&&
+                        !(to_x == from_x-2 && to_y == from_y-1)&&!(to_x == from_x-1 && to_y == from_y-2))
+                    return false;
+                // 卡马脚
+                if((to_index == from_index+1-18 && board[from_index-9] != 0) || (to_index == from_index+2-9 && board[from_index+1] != 0) ||
+                        (to_index == from_index+2+9 && board[from_index+1] != 0) || (to_index == from_index+1+18 && board[from_index+9] != 0) ||
+                        (to_index == from_index-1-18 && board[from_index-9] != 0) || (to_index == from_index-2-9 && board[from_index-1] != 0) ||
+                        (to_index == from_index-2+9 && board[from_index-1] != 0) || (to_index == from_index-1+18 && board[from_index+9] != 0)) {
+                    return false;
+                }
+                break;
+            case 21:case 22: // 象
+                // 不能过河
+                if(to_index < 45)
+                    return false;
+                // 走田字
+                if(!(to_x == from_x+2 && to_y == from_y-2)&&!(to_x == from_x+2 && to_y == from_y+2)&&
+                        !(to_x == from_x-2 && to_y == from_y+2)&&!(to_x == from_x-2 && to_y == from_y-2))
+                    return false;
+                // 卡象脚
+                if((to_index == from_index+2-18 && board[from_index+1-9] != 0) || (to_index == from_index+2+18 && board[from_index+1+9] != 0) ||
+                        (to_index == from_index-2-18 && board[from_index-1-9] != 0) || (to_index == from_index-2+18 && board[from_index-1+9] != 0)) {
+                    return false;
+                }
+                break;
+            case 23: case 24: // 士
+                // 不能出王宫
+                if(to_y < 7 || to_x <3 || to_x > 5)
+                    return false;
+                // 走对角
+                if(!(to_x == from_x+1 && to_y == from_y-1)&&!(to_x == from_x+1 && to_y == from_y+1)&&
+                        !(to_x == from_x-1 && to_y == from_y+1)&&!(to_x == from_x-1 && to_y == from_y-1))
+                    return false;
+                break;
+            case 32: // 将
+                if(to == 16 && from_x == to_x) {
+                    int i = 0;
+                    for (i = 0; i < 90; i++)
+                        if (board[i] == 16)
+                            break;
+                    if (i % 9 == to_x) {
+                        int count = 0;
+                        for (int j = from_index - 9; j > i; j -= 9)
+                            if (board[j] != 0)
+                                count++;
+                        if (count == 0)
+                            return true;
+                    }
+                }
+                // 不能出王宫
+                if(to_y < 7 || to_x <3 || to_x > 5)
+                    return false;
+                // 走直线
+                if(to_index != from_index+1 && to_index != from_index-1 && to_index != from_index+9 && to_index != from_index-9)
+                    return false;
+                // 将帅不能直视
+                int i = 0;
+                for(i = 0; i < 90; i++)
+                    if(board[i] == 16)
+                        break;
+                if(i%9 == to_x) {
+                    int count = 0;
+                    for(int j = from_index-9; j > i; j-=9)
+                        if(board[j] != 0)
+                            count++;
+                    if(count==0)
+                        return false;
+                }
+                break;
+            case 25: case 26: // 炮
+                if(from_x != to_x && from_y != to_y) // 只能横向或者纵向移动
+                    return false;
+                if(from_y == to_y) {  // 移动路径中最多跨一个棋子
+                    int count = 0;
+                    if(from_index < to_index) {
+                        for(i = from_index+1; i < to_index; i++)
+                            if(board[i] != 0)
+                                count++;
+                    } else {
+                        for(i = from_index-1; i > to_index; i--)
+                            if(board[i] != 0)
+                                count++;
+                    }
+                    if(count > 1)
+                        return false;
+                    if(count == 0 && board[to_index] != 0) // 不跨子不能吃
+                        return false;
+                    if(count != 0 && board[to_index] == 0 ) // 不吃子不能跨
+                        return false;
                 } else {
-                    for(int i = from_index-9; i > to_index; i-=9)
-                        if(board[i] != 0)
-                            return false;
+                    int count = 0;
+                    if(from_index < to_index) {
+                        for(i = from_index+9; i < to_index; i+=9)
+                            if(board[i] != 0)
+                                count++;
+                    } else {
+                        for(i = from_index-9; i > to_index; i-=9)
+                            if(board[i] != 0)
+                                count++;
+                    }
+                    if(count > 1)
+                        return false;
+                    if(count == 0 && board[to_index] != 0) // 不跨子不能吃
+                        return false;
+                    if(count != 0 && board[to_index] == 0 ) // 不吃子不能跨
+                        return false;
                 }
-            }
-            return true;
-        }
-        // 炮
-        if(from == 25 || from == 26) {
-            if(from_x != to_x && from_y != to_y) // 只能横向或者纵向移动
-                return false;
-            if(from_y == to_y) {  // 移动路径中最多跨一个棋子
-                int count = 0;
-                if(from_index < to_index) {
-                    for(int i = from_index+1; i < to_index; i++)
-                        if(board[i] != 0)
-                            count++;
-                } else {
-                    for(int i = from_index-1; i > to_index; i--)
-                        if(board[i] != 0)
-                            count++;
-                }
-                if(count > 1)
+                break;
+            case 27: case 28: case 29: case 30: case 31: // 兵
+                if( from_index > 44 && from_y == to_y && (to_x == from_x-1 || to_x == from_x+1)) // 过河前不能左右移动
                     return false;
-                if(count == 0 && board[to_index] != 0) // 不跨子不能吃
-                    return false;
-                if(count != 0 && board[to_index] == 0 ) // 不吃子不能跨
-                    return false;
-
-            } else {
-                int count = 0;
-                if(from_index < to_index) {
-                    for(int i = from_index+9; i < to_index; i+=9)
-                        if(board[i] != 0)
-                            count++;
-                } else {
-                    for(int i = from_index-9; i > to_index; i-=9)
-                        if(board[i] != 0)
-                            count++;
-                }
-                if(count > 1)
-                    return false;
-                if(count == 0 && board[to_index] != 0) // 不跨子不能吃
-                    return false;
-                if(count != 0 && board[to_index] == 0 ) // 不吃子不能跨
-                    return false;
-            }
-            return true;
-        }
-        // 马
-        if(from == 19 || from == 20) {
-            // 走日字
-            if(!(to_x == from_x+1 && to_y == from_y-2)&&!(to_x == from_x+2 && to_y == from_y-1)&&
-                    !(to_x == from_x+2 && to_y == from_y+1)&&!(to_x == from_x+1 && to_y == from_y+2)&&
-                    !(to_x == from_x-1 && to_y == from_y+2)&&!(to_x == from_x-2 && to_y == from_y+1)&&
-                    !(to_x == from_x-2 && to_y == from_y-1)&&!(to_x == from_x-1 && to_y == from_y-2))
-                return false;
-            // 卡马脚
-            if((to_index == from_index+1-18 && board[from_index-9] != 0) || (to_index == from_index+2-9 && board[from_index+1] != 0) ||
-                    (to_index == from_index+2+9 && board[from_index+1] != 0) || (to_index == from_index+1+18 && board[from_index+9] != 0) ||
-                    (to_index == from_index-1-18 && board[from_index-9] != 0) || (to_index == from_index-2-9 && board[from_index-1] != 0) ||
-                    (to_index == from_index-2+9 && board[from_index-1] != 0) || (to_index == from_index-1+18 && board[from_index+9] != 0)) {
-                return false;
-            }
-            return true;
-        }
-        // 象
-        if(from == 21 || from == 22) {
-            // 不能过河
-            if(to_index < 45)
-                return false;
-            // 走田字
-            if(!(to_x == from_x+2 && to_y == from_y-2)&&!(to_x == from_x+2 && to_y == from_y+2)&&
-                    !(to_x == from_x-2 && to_y == from_y+2)&&!(to_x == from_x-2 && to_y == from_y-2))
-                return false;
-            // 卡象脚
-            if((to_index == from_index+2-18 && board[from_index+1-9] != 0) || (to_index == from_index+2+18 && board[from_index+1+9] != 0) ||
-                    (to_index == from_index-2-18 && board[from_index-1-9] != 0) || (to_index == from_index-2+18 && board[from_index-1+9] != 0)) {
-                return false;
-            }
-            return true;
-        }
-        // 士
-        if(from == 23 || from == 24) {
-            // 不能出王宫
-            if(to_y < 7 || to_x <3 || to_x > 5)
-                return false;
-            // 走对角
-            if(!(to_x == from_x+1 && to_y == from_y-1)&&!(to_x == from_x+1 && to_y == from_y+1)&&
-                    !(to_x == from_x-1 && to_y == from_y+1)&&!(to_x == from_x-1 && to_y == from_y-1))
-                return false;
-            return true;
-        }
-        // 帅
-        if(from == 32) {
-            // 不能出王宫
-            if(to_y < 7 || to_x <3 || to_x > 5)
-                return false;
-            // 走直线
-            if(to_index != from_index+1 && to_index != from_index-1 && to_index != from_index+9 && to_index != from_index-9)
-                return false;
-            // 将帅不能直视
-            int i = 0;
-            for(i = 0; i < 90; i++)
-                if(board[i] == 16)
-                    break;
-            if(i%9 == to_x) {
-                int count = 0;
-                for(int j = to_index-9; j > i; j-=9)
-                    if(board[j] != 0)
-                        count++;
-                if(count==0)
-                    return false;
-            }
-            return true;
+                if(!(from_y == to_y && from_x == to_x-1)&&!(from_y == to_y && from_x == to_x+1)&&!(from_x==to_x && to_y==from_y-1))
+                    return false; // 不能后退
+                break;
+            default:
+                break;
         }
         return true;
     }
@@ -435,6 +442,7 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     Calendar calendar = Calendar.getInstance();
                     last_time = calendar.get(Calendar.SECOND);
+                    last_min = calendar.get(Calendar.MINUTE);
                     Observable observable = Observable.create(new Observable.OnSubscribe<String>() {
                         @Override
                         public void call(final Subscriber<? super String> subscriber) {
