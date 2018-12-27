@@ -486,22 +486,26 @@ public class MainActivity extends AppCompatActivity {
             result = result + v[i] + ".";
         return result;
     }
-    boolean harder() {
-        int count = 0;
-        for(int i = 0; i < 90; i++) {
-            if(board[i] != 0)
-                count++;
-        }
-        return count<20;
-    }
+    // 6层太慢，要1-2分钟
+//    boolean harder() {
+//        int count = 0;
+//        for(int i = 0; i < 90; i++) {
+//            if(board[i] != 0)
+//                count++;
+//        }
+//        return count<20;
+//    }
 
     void send_chess() {
         try {
             String baseUrl = server_url;
             //合成参数
             StringBuilder tempParams = new StringBuilder();
-            if(harder())
-                mode += 1;
+//            if(harder()) {
+//                int hard = mode+1;
+//                tempParams.append("\""+hard+"chess:"+vec_to_str(board)+"\"");
+//            }
+//            else
             tempParams.append("\""+mode+"chess:"+vec_to_str(board)+"\"");
             String params =tempParams.toString();
             // 请求的参数转换为byte数组
