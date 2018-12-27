@@ -105,6 +105,18 @@ public class MainActivity extends AppCompatActivity {
             0, 0, 0, 0, 0, 0, 0, 0, 0,
             17,19,21,23,32,24,22,20,18
     };
+//private int[] board = {
+//        0, 0, 0, 7,16, 8, 0, 0, 0,
+//        0, 0, 0, 0, 0, 0, 0, 0, 0,
+//        0, 9, 0, 0, 0, 0, 0,10, 0,
+//        11, 0,12, 0,0, 0,14, 0,15,
+//        0, 0, 0, 0, 0, 0, 0, 0, 0,
+//        0, 0, 0, 0, 0, 0, 0, 0, 0,
+//        27, 0,0, 0,0, 0,30, 0,0,
+//        0,25, 0, 0, 0, 0, 0,26, 0,
+//        0, 0, 0, 0, 24, 0, 0, 0, 0,
+//        17,0,19,23,32,0,22,0,0
+//};
     private int[] first_board = {
             1, 3, 5, 7,16, 8, 6, 4, 2,
             0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -474,12 +486,22 @@ public class MainActivity extends AppCompatActivity {
             result = result + v[i] + ".";
         return result;
     }
+    boolean harder() {
+        int count = 0;
+        for(int i = 0; i < 90; i++) {
+            if(board[i] != 0)
+                count++;
+        }
+        return count<20;
+    }
+
     void send_chess() {
         try {
             String baseUrl = server_url;
             //合成参数
             StringBuilder tempParams = new StringBuilder();
-            int pos = 0;
+            if(harder())
+                mode += 1;
             tempParams.append("\""+mode+"chess:"+vec_to_str(board)+"\"");
             String params =tempParams.toString();
             // 请求的参数转换为byte数组
