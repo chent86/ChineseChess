@@ -1,4 +1,5 @@
 public class AI {
+	int m_board[];
     int che_pos[] = {
             206,208,207,213,214,213,207,208,206,
             206,212,209,216,233,216,209,212,206,
@@ -95,36 +96,36 @@ public class AI {
             System.out.println("");
         }
     }
-    String vec_to_str(int[] v) {
-        String result = "";
-        for(int i = 0; i < v.length; i++)
-            result = result + v[i] + ".";
-        return result;
-    }
-    static int[] str_to_vec(String str) {
-        int[] result = new int[90];
-        String[] s = str.split("\\.");
-        for(int i = 0; i <90; i++)
-            result[i] = Integer.parseInt(s[i]);
-        return result;
-    }
-    // a-b¼ôÖ¦
+//    String vec_to_str(int[] v) {
+//        String result = "";
+//        for(int i = 0; i < v.length; i++)
+//            result = result + v[i] + ".";
+//        return result;
+//    }
+//    static int[] str_to_vec(String str) {
+//        int[] result = new int[90];
+//        String[] s = str.split("\\.");
+//        for(int i = 0; i <90; i++)
+//            result[i] = Integer.parseInt(s[i]);
+//        return result;
+//    }
+    // a-bå‰ªæ
     public node a_b(int[] cur, int height) {
-        node root = new node(cur, true, null);
+    	m_board = cur.clone();
+        node root = new node(true, null);
         new_process(root, height-1);
         return root;
     }
 
-    int evaluation(String str) {
-        int[] board = str_to_vec(str);
+    int evaluation(int[] board) {
         return  evaluation_power(board)+evaluation_pos(board);
     }
 
 
-    // ÆÀ¹ÀÆåÁ¦
+    // è¯„ä¼°æ£‹åŠ›
     int evaluation_power(int[] board) {
         int result = 0;
-        for(int i = 0; i < board.length; i++) {
+        for(int i = 0; i < 90; i++) {
             if(board[i] < 17 ) {
                 result += get_power(board[i]);
             } else
@@ -132,10 +133,10 @@ public class AI {
         }
         return result;
     }
-    // ÆÀ¹ÀÆå×ÓÎ»ÖÃ
+    // è¯„ä¼°æ£‹å­ä½ç½®
     int evaluation_pos(int[] board) {
         int result = 0;
-        for(int i = 0; i <board.length; i++) {
+        for(int i = 0; i < 90; i++) {
             if(board[i] < 17) {
                 int chess = board[i];
                 switch(chess) {
@@ -200,7 +201,7 @@ public class AI {
             600,600,270,270,120,120,120,120,
             285,285,30,30,30,30,30,10000
     };
-    // »ñµÃÆåÁ¦
+    // è·å¾—æ£‹åŠ›
     int get_power(int chess) {
         if(chess == 0)
             return 0;
@@ -217,12 +218,10 @@ public class AI {
     }
 
     void new_process(node p, int height) {
-//    	List<Thread> thread_pool = new ArrayList<>();
-        int[] data = str_to_vec(p.val);
-        if(height == -1)
-            return;
-        if(game_over(data)) {
-            int value = evaluation(p.val);
+//        if(height == -1)
+//            return;
+        if(game_over(m_board)) {
+            int value = evaluation(m_board);
             if(p.type) {
                 p.ex = value;
             } else {
@@ -231,75 +230,81 @@ public class AI {
             return;
         }
         int cur;
-        if(p.type) // µ±Ç°ÊÇ¼«´ó²ã
+        if(p.type) // å½“å‰æ˜¯æå¤§å±‚
             cur = Integer.MIN_VALUE;
-        else        // µ±Ç°ÊÇ¼«Ğ¡²ã
+        else        // å½“å‰æ˜¯æå°å±‚
             cur = Integer.MAX_VALUE;
-        for(int i = 0; i < data.length; i++) {
-            if((data[i] == 0)||(p.type && data[i] > 16)||(!p.type && data[i] <= 16))
+        for(int i = 0; i < 90; i++) {
+            if((m_board[i] == 0)||(p.type && m_board[i] > 16)||(!p.type && m_board[i] <= 16))
                 continue;
-//            int[] possible_move = get_all_pos(i, data[i]).clone();
             for(int j = 0; j < 90; j++) {
-                if((p.type && data[j] <= 16 && data[j] != 0)||(!p.type && data[j] > 16))
+                if((p.type && m_board[j] <= 16 && m_board[j] != 0)||(!p.type && m_board[j] > 16))
                     continue;
-                if(can_move(i, j, data, p.type)) {
-                    int[] new_val = data.clone();
-                    new_val[j] = new_val[i];
-                    new_val[i] = 0;
+                if(can_move(i, j, m_board, p.type)) {
+                	int j_value = m_board[j];
+                	m_board[j] = m_board[i];
+                	m_board[i] = 0;
 //                    if(i == 12 && j == 39 && height==3) {
 //                    	m_print(new_val);
 //                    }
-                    node child = new node(new_val, !p.type, p);
                     if(height == 0) {
-                        int value = evaluation(child.val);
-                        if(p.type) { // ¼«´ó²ã
+                        int value = evaluation(m_board);
+                        if(p.type) { // æå¤§å±‚
                             if(value > cur) {
                                 cur = value;
-                                p.choose = child.val;
+                                p.from = i;
+                                p.to = j;
                             }
                             if(p.parent != null && p.parent.update == true && cur >= p.parent.ex) {
                                 p.ex = cur;
-                                return; // b¼ôÖ¦
+                                m_board[i] = m_board[j];
+                                m_board[j] = j_value;
+                                return; // bå‰ªæ
                             }
-                        } else { // ¼«Ğ¡²ã
+                        } else { // æå°å±‚
                             if(value < cur) {
                                 cur = value;
-                                p.choose = child.val;
+                                p.from = i;
+                                p.to = j;
                             }
                             if(p.parent != null && p.parent.update == true && p.parent.ex >= cur) {
                                 p.ex = cur;
-                                return; // a¼õÖ¦
+                                m_board[i] = m_board[j];
+                                m_board[j] = j_value;
+                                return; // aå‡æ
                             }
                         }
-//                        child = null;
                     } else {
+                        node child = new node(!p.type, p);
                         new_process(child, height-1);
-                        if(p.type) { // ¼«´ó²ã
+                        if(p.type) { // æå¤§å±‚
                             if(child.ex > cur) {
                                 cur = child.ex;
-                                p.choose = child.val;
+                                p.from = i;
+                                p.to = j;
                             }
                             if(p.parent != null && p.parent.update == true && cur >= p.parent.ex) {
                                 p.ex = cur;
-                                return; // b¼ôÖ¦
+                                m_board[i] = m_board[j];
+                                m_board[j] = j_value;             
+                                return; // bå‰ªæ
                             }
-                        } else { // ¼«Ğ¡²ã
+                        } else { // æå°å±‚
                             if(child.ex < cur) {
                                 cur = child.ex;
-                                p.choose = child.val;
+                                p.from = i;
+                                p.to = j;
                             }
                             if(p.parent != null && p.parent.update == true && p.parent.ex >= cur) {
                                 p.ex = cur;
-                                return; // a¼ôÖ¦
+                                m_board[i] = m_board[j];
+                                m_board[j] = j_value;
+                                return; // aå‰ªæ
                             }
                         }
-//                    	Thread new_thread = new Thread() {
-//                    		public void run() {
-//
-//                    		}
-//                    	};
-//                    	new_thread.start();
                     }
+                    m_board[i] = m_board[j];
+                    m_board[j] = j_value;
                 }
             }
         }
@@ -336,15 +341,15 @@ public class AI {
         if(type) {
             int from = board[from_index];
             int to = board[to_index];
-            if(from > 16 || from == 0) // ²»ÄÜÒÆ¶¯¿Õ°×»òÕßºì·½
+            if(from > 16 || from == 0) // ä¸èƒ½ç§»åŠ¨ç©ºç™½æˆ–è€…çº¢æ–¹
                 return false;
             if(to < 17 && to != 0)
-                return false; // ²»ÄÜ×Ô²Ğ
+                return false; // ä¸èƒ½è‡ªæ®‹
             switch(from) {
-                case 1:case 2: // ³µ
-                    if(from_x != to_x && from_y != to_y) // Ö»ÄÜºáÏò»òÕß×İÏòÒÆ¶¯
+                case 1:case 2: // è½¦
+                    if(from_x != to_x && from_y != to_y) // åªèƒ½æ¨ªå‘æˆ–è€…çºµå‘ç§»åŠ¨
                         return false;
-                    if(from_y == to_y) { // Â·¾¶ÉÏ²»ÄÜÓĞÆäËûÆå×Ó
+                    if(from_y == to_y) { // è·¯å¾„ä¸Šä¸èƒ½æœ‰å…¶ä»–æ£‹å­
                         if(from_index < to_index) {
                             for(int i = from_index+1; i < to_index; i++)
                                 if(board[i] != 0)
@@ -366,14 +371,14 @@ public class AI {
                         }
                     }
                     break;
-                case 3:case 4:	// Âí
-                    // ×ßÈÕ×Ö
+                case 3:case 4:	// é©¬
+                    // èµ°æ—¥å­—
                     if(!(to_x == from_x+1 && to_y == from_y-2)&&!(to_x == from_x+2 && to_y == from_y-1)&&
                             !(to_x == from_x+2 && to_y == from_y+1)&&!(to_x == from_x+1 && to_y == from_y+2)&&
                             !(to_x == from_x-1 && to_y == from_y+2)&&!(to_x == from_x-2 && to_y == from_y+1)&&
                             !(to_x == from_x-2 && to_y == from_y-1)&&!(to_x == from_x-1 && to_y == from_y-2))
                         return false;
-                    // ¿¨Âí½Å
+                    // å¡é©¬è„š
                     if((to_index == from_index+1-18 && board[from_index-9] != 0) || (to_index == from_index+2-9 && board[from_index+1] != 0) ||
                             (to_index == from_index+2+9 && board[from_index+1] != 0) || (to_index == from_index+1+18 && board[from_index+9] != 0) ||
                             (to_index == from_index-1-18 && board[from_index-9] != 0) || (to_index == from_index-2-9 && board[from_index-1] != 0) ||
@@ -381,30 +386,30 @@ public class AI {
                         return false;
                     }
                     break;
-                case 5:case 6: // Ïó
-                    // ²»ÄÜ¹ıºÓ
+                case 5:case 6: // è±¡
+                    // ä¸èƒ½è¿‡æ²³
                     if(to_index > 44)
                         return false;
-                    // ×ßÌï×Ö
+                    // èµ°ç”°å­—
                     if(!(to_x == from_x+2 && to_y == from_y-2)&&!(to_x == from_x+2 && to_y == from_y+2)&&
                             !(to_x == from_x-2 && to_y == from_y+2)&&!(to_x == from_x-2 && to_y == from_y-2))
                         return false;
-                    // ¿¨Ïó½Å
+                    // å¡è±¡è„š
                     if((to_index == from_index+2-18 && board[from_index+1-9] != 0) || (to_index == from_index+2+18 && board[from_index+1+9] != 0) ||
                             (to_index == from_index-2-18 && board[from_index-1-9] != 0) || (to_index == from_index-2+18 && board[from_index-1+9] != 0)) {
                         return false;
                     }
                     break;
-                case 7: case 8: // Ê¿
-                    // ²»ÄÜ³öÍõ¹¬
+                case 7: case 8: // å£«
+                    // ä¸èƒ½å‡ºç‹å®«
                     if(to_y > 2 || to_x <3 || to_x > 5)
                         return false;
-                    // ×ß¶Ô½Ç
+                    // èµ°å¯¹è§’
                     if(!(to_x == from_x+1 && to_y == from_y-1)&&!(to_x == from_x+1 && to_y == from_y+1)&&
                             !(to_x == from_x-1 && to_y == from_y+1)&&!(to_x == from_x-1 && to_y == from_y-1))
                         return false;
                     break;
-                case 16: // Ë§
+                case 16: // å¸…
                     if(to == 32 && from_x == to_x) {
                         int i = 0;
                         for(i = 0; i < 90; i++)
@@ -419,13 +424,13 @@ public class AI {
                                 return true;
                         }
                     }
-                    // ²»ÄÜ³öÍõ¹¬
+                    // ä¸èƒ½å‡ºç‹å®«
                     if(to_y > 2 || to_x <3 || to_x > 5)
                         return false;
-                    // ×ßÖ±Ïß
+                    // èµ°ç›´çº¿
                     if(to_index != from_index+1 && to_index != from_index-1 && to_index != from_index+9 && to_index != from_index-9)
                         return false;
-                    // ½«Ë§²»ÄÜÖ±ÊÓ
+                    // å°†å¸…ä¸èƒ½ç›´è§†
                     int i = 0;
                     for(i = 0; i < 90; i++)
                         if(board[i] == 32)
@@ -439,10 +444,10 @@ public class AI {
                             return false;
                     }
                     break;
-                case 9: case 10: // ÅÚ
-                    if(from_x != to_x && from_y != to_y) // Ö»ÄÜºáÏò»òÕß×İÏòÒÆ¶¯
+                case 9: case 10: // ç‚®
+                    if(from_x != to_x && from_y != to_y) // åªèƒ½æ¨ªå‘æˆ–è€…çºµå‘ç§»åŠ¨
                         return false;
-                    if(from_y == to_y) {  // ÒÆ¶¯Â·¾¶ÖĞ×î¶à¿çÒ»¸öÆå×Ó
+                    if(from_y == to_y) {  // ç§»åŠ¨è·¯å¾„ä¸­æœ€å¤šè·¨ä¸€ä¸ªæ£‹å­
                         int count = 0;
                         if(from_index < to_index) {
                             for(i = from_index+1; i < to_index; i++)
@@ -455,9 +460,9 @@ public class AI {
                         }
                         if(count > 1)
                             return false;
-                        if(count == 0 && board[to_index] != 0) // ²»¿ç×Ó²»ÄÜ³Ô
+                        if(count == 0 && board[to_index] != 0) // ä¸è·¨å­ä¸èƒ½åƒ
                             return false;
-                        if(count != 0 && board[to_index] == 0 ) // ²»³Ô×Ó²»ÄÜ¿ç
+                        if(count != 0 && board[to_index] == 0 ) // ä¸åƒå­ä¸èƒ½è·¨
                             return false;
                     } else {
                         int count = 0;
@@ -472,17 +477,17 @@ public class AI {
                         }
                         if(count > 1)
                             return false;
-                        if(count == 0 && board[to_index] != 0) // ²»¿ç×Ó²»ÄÜ³Ô
+                        if(count == 0 && board[to_index] != 0) // ä¸è·¨å­ä¸èƒ½åƒ
                             return false;
-                        if(count != 0 && board[to_index] == 0 ) // ²»³Ô×Ó²»ÄÜ¿ç
+                        if(count != 0 && board[to_index] == 0 ) // ä¸åƒå­ä¸èƒ½è·¨
                             return false;
                     }
                     break;
-                case 11: case 12: case 13: case 14: case 15: // ±ø
-                    if( from_index < 45 && from_y == to_y && (to_x == from_x-1 || to_x == from_x+1)) // ¹ıºÓÇ°²»ÄÜ×óÓÒÒÆ¶¯
+                case 11: case 12: case 13: case 14: case 15: // å…µ
+                    if( from_index < 45 && from_y == to_y && (to_x == from_x-1 || to_x == from_x+1)) // è¿‡æ²³å‰ä¸èƒ½å·¦å³ç§»åŠ¨
                         return false;
                     if(!(from_y == to_y && from_x == to_x-1)&&!(from_y == to_y && from_x == to_x+1)&&!(from_x==to_x && to_y==from_y+1)) {
-                        return false; // ²»ÄÜºóÍË
+                        return false; // ä¸èƒ½åé€€
                     }
                     break;
                 default:
@@ -492,14 +497,14 @@ public class AI {
             int from = board[from_index];
             int to = board[to_index];
             if(from < 17)
-                return false; // Ö»ÄÜÒÆ¶¯ºì·½
+                return false; // åªèƒ½ç§»åŠ¨çº¢æ–¹
             if(to >= 17)
-                return false; // ²»ÄÜ×Ô²Ğ
+                return false; // ä¸èƒ½è‡ªæ®‹
             switch(from) {
-                case 17:case 18: // ³µ
-                    if(from_x != to_x && from_y != to_y) // Ö»ÄÜºáÏò»òÕß×İÏòÒÆ¶¯
+                case 17:case 18: // è½¦
+                    if(from_x != to_x && from_y != to_y) // åªèƒ½æ¨ªå‘æˆ–è€…çºµå‘ç§»åŠ¨
                         return false;
-                    if(from_y == to_y) { // Â·¾¶ÉÏ²»ÄÜÓĞÆäËûÆå×Ó
+                    if(from_y == to_y) { // è·¯å¾„ä¸Šä¸èƒ½æœ‰å…¶ä»–æ£‹å­
                         if(from_index < to_index) {
                             for(int i = from_index+1; i < to_index; i++)
                                 if(board[i] != 0)
@@ -521,14 +526,14 @@ public class AI {
                         }
                     }
                     break;
-                case 19:case 20: // Âí
-                    // ×ßÈÕ×Ö
+                case 19:case 20: // é©¬
+                    // èµ°æ—¥å­—
                     if(!(to_x == from_x+1 && to_y == from_y-2)&&!(to_x == from_x+2 && to_y == from_y-1)&&
                             !(to_x == from_x+2 && to_y == from_y+1)&&!(to_x == from_x+1 && to_y == from_y+2)&&
                             !(to_x == from_x-1 && to_y == from_y+2)&&!(to_x == from_x-2 && to_y == from_y+1)&&
                             !(to_x == from_x-2 && to_y == from_y-1)&&!(to_x == from_x-1 && to_y == from_y-2))
                         return false;
-                    // ¿¨Âí½Å
+                    // å¡é©¬è„š
                     if((to_index == from_index+1-18 && board[from_index-9] != 0) || (to_index == from_index+2-9 && board[from_index+1] != 0) ||
                             (to_index == from_index+2+9 && board[from_index+1] != 0) || (to_index == from_index+1+18 && board[from_index+9] != 0) ||
                             (to_index == from_index-1-18 && board[from_index-9] != 0) || (to_index == from_index-2-9 && board[from_index-1] != 0) ||
@@ -536,30 +541,30 @@ public class AI {
                         return false;
                     }
                     break;
-                case 21:case 22: // Ïó
-                    // ²»ÄÜ¹ıºÓ
+                case 21:case 22: // è±¡
+                    // ä¸èƒ½è¿‡æ²³
                     if(to_index < 45)
                         return false;
-                    // ×ßÌï×Ö
+                    // èµ°ç”°å­—
                     if(!(to_x == from_x+2 && to_y == from_y-2)&&!(to_x == from_x+2 && to_y == from_y+2)&&
                             !(to_x == from_x-2 && to_y == from_y+2)&&!(to_x == from_x-2 && to_y == from_y-2))
                         return false;
-                    // ¿¨Ïó½Å
+                    // å¡è±¡è„š
                     if((to_index == from_index+2-18 && board[from_index+1-9] != 0) || (to_index == from_index+2+18 && board[from_index+1+9] != 0) ||
                             (to_index == from_index-2-18 && board[from_index-1-9] != 0) || (to_index == from_index-2+18 && board[from_index-1+9] != 0)) {
                         return false;
                     }
                     break;
-                case 23: case 24: // Ê¿
-                    // ²»ÄÜ³öÍõ¹¬
+                case 23: case 24: // å£«
+                    // ä¸èƒ½å‡ºç‹å®«
                     if(to_y < 7 || to_x <3 || to_x > 5)
                         return false;
-                    // ×ß¶Ô½Ç
+                    // èµ°å¯¹è§’
                     if(!(to_x == from_x+1 && to_y == from_y-1)&&!(to_x == from_x+1 && to_y == from_y+1)&&
                             !(to_x == from_x-1 && to_y == from_y+1)&&!(to_x == from_x-1 && to_y == from_y-1))
                         return false;
                     break;
-                case 32: // ½«
+                case 32: // å°†
                     if(to == 16 && from_x == to_x) {
                         int i = 0;
                         for (i = 0; i < 90; i++)
@@ -574,13 +579,13 @@ public class AI {
                                 return true;
                         }
                     }
-                    // ²»ÄÜ³öÍõ¹¬
+                    // ä¸èƒ½å‡ºç‹å®«
                     if(to_y < 7 || to_x <3 || to_x > 5)
                         return false;
-                    // ×ßÖ±Ïß
+                    // èµ°ç›´çº¿
                     if(to_index != from_index+1 && to_index != from_index-1 && to_index != from_index+9 && to_index != from_index-9)
                         return false;
-                    // ½«Ë§²»ÄÜÖ±ÊÓ
+                    // å°†å¸…ä¸èƒ½ç›´è§†
                     int i = 0;
                     for(i = 0; i < 90; i++)
                         if(board[i] == 16)
@@ -594,10 +599,10 @@ public class AI {
                             return false;
                     }
                     break;
-                case 25: case 26: // ÅÚ
-                    if(from_x != to_x && from_y != to_y) // Ö»ÄÜºáÏò»òÕß×İÏòÒÆ¶¯
+                case 25: case 26: // ç‚®
+                    if(from_x != to_x && from_y != to_y) // åªèƒ½æ¨ªå‘æˆ–è€…çºµå‘ç§»åŠ¨
                         return false;
-                    if(from_y == to_y) {  // ÒÆ¶¯Â·¾¶ÖĞ×î¶à¿çÒ»¸öÆå×Ó
+                    if(from_y == to_y) {  // ç§»åŠ¨è·¯å¾„ä¸­æœ€å¤šè·¨ä¸€ä¸ªæ£‹å­
                         int count = 0;
                         if(from_index < to_index) {
                             for(i = from_index+1; i < to_index; i++)
@@ -610,9 +615,9 @@ public class AI {
                         }
                         if(count > 1)
                             return false;
-                        if(count == 0 && board[to_index] != 0) // ²»¿ç×Ó²»ÄÜ³Ô
+                        if(count == 0 && board[to_index] != 0) // ä¸è·¨å­ä¸èƒ½åƒ
                             return false;
-                        if(count != 0 && board[to_index] == 0 ) // ²»³Ô×Ó²»ÄÜ¿ç
+                        if(count != 0 && board[to_index] == 0 ) // ä¸åƒå­ä¸èƒ½è·¨
                             return false;
                     } else {
                         int count = 0;
@@ -627,17 +632,17 @@ public class AI {
                         }
                         if(count > 1)
                             return false;
-                        if(count == 0 && board[to_index] != 0) // ²»¿ç×Ó²»ÄÜ³Ô
+                        if(count == 0 && board[to_index] != 0) // ä¸è·¨å­ä¸èƒ½åƒ
                             return false;
-                        if(count != 0 && board[to_index] == 0 ) // ²»³Ô×Ó²»ÄÜ¿ç
+                        if(count != 0 && board[to_index] == 0 ) // ä¸åƒå­ä¸èƒ½è·¨
                             return false;
                     }
                     break;
-                case 27: case 28: case 29: case 30: case 31: // ±ø
-                    if( from_index > 44 && from_y == to_y && (to_x == from_x-1 || to_x == from_x+1)) // ¹ıºÓÇ°²»ÄÜ×óÓÒÒÆ¶¯
+                case 27: case 28: case 29: case 30: case 31: // å…µ
+                    if( from_index > 44 && from_y == to_y && (to_x == from_x-1 || to_x == from_x+1)) // è¿‡æ²³å‰ä¸èƒ½å·¦å³ç§»åŠ¨
                         return false;
                     if(!(from_y == to_y && from_x == to_x-1)&&!(from_y == to_y && from_x == to_x+1)&&!(from_x==to_x && to_y==from_y-1))
-                        return false; // ²»ÄÜºóÍË
+                        return false; // ä¸èƒ½åé€€
                     break;
                 default:
                     break;

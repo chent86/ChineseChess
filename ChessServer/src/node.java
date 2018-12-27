@@ -1,15 +1,12 @@
 public class node {
-    boolean type; // true:¼«´ó²ã  false:¼«Ğ¡²ã
+    boolean type; // true:æå¤§å±‚  false:æå°å±‚
     boolean update;
     int ex;
-    String val;
     node parent;
-    String choose;
-    node(int[] val, boolean type, node parent) {
+    int from;
+    int to;
+    node(boolean type, node parent) {
         this.update = false;
-        this.val = "";
-        for(int i = 0; i < val.length; i++)
-            this.val = this.val + val[i]+ ".";
         this.type = type;
         this.parent = parent;
     }

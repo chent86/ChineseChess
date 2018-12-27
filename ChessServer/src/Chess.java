@@ -24,15 +24,10 @@ public class Chess {
 	   Matcher m = p.matcher(message);
 	   m.find();
 	   str = m.group();
-	   System.out.println("ÊÕµ½Æå¾Ö");
+	   System.out.println("ï¿½Õµï¿½ï¿½ï¿½ï¿½");
 	   int[] board = str_to_vec(str.substring(8, str.length()-2));
 	   m_AI.m_print(board);
-	   node root;
-	   String a = str.substring(1,2);
-	   if(str.substring(1,2).equals("0"))
-		   root = m_AI.a_b(board, 3);
-	   else
-		   root = m_AI.a_b(board, 4);
+	   node root = m_AI.a_b(board, Integer.parseInt(str.substring(1,2)));
 	   int[] result = str_to_vec(root.choose).clone();
 	   OutputStreamWriter osw = new OutputStreamWriter(op,"utf-8");
        osw.write("HTTP/1.1 200 OK\r\n");
@@ -41,7 +36,7 @@ public class Chess {
 ////       osw.write("Date: Tue, 19 May 2015 02:48:27 GMT\r\n");
        osw.write("\r\n");
 //       osw.write("c9\r\n");
-       System.out.println("·µ»Ø½á¹û");
+       System.out.println("ï¿½ï¿½ï¿½Ø½ï¿½ï¿½");
        m_AI.m_print(result);
        osw.write(vec_to_str(result));
        osw.flush();
@@ -58,7 +53,7 @@ public class Chess {
 	    }
     public static void main(String[] args)  throws IOException{
     	
-//        int[] board = { // ÖÐÅÚ¿ª¾Ö
+//        int[] board = { // ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½
 //                1, 3, 5, 7,16, 8, 6, 4, 2,
 //                0, 0, 0, 0, 0, 0, 0, 0, 0,
 //                0, 9, 0, 0, 0, 0, 0,10, 0,
