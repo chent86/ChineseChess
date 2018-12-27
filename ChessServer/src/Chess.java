@@ -18,17 +18,17 @@ public class Chess {
 	
 	 public static void doPost(String message,OutputStream op,byte [] buf) throws IOException{
 	   AI m_AI = new AI();
-		 
 	   String str="";
-	   Pattern p = Pattern.compile("\"[0-1]chess:[0-9]*.*\"");
+	   Pattern p = Pattern.compile("\"[0-9]chess:[0-9]*.*\"");
 	   Matcher m = p.matcher(message);
 	   m.find();
 	   str = m.group();
-	   System.out.println("�յ����");
+	   System.out.println("收到棋局");
 	   int[] board = str_to_vec(str.substring(8, str.length()-2));
 	   m_AI.m_print(board);
 	   node root = m_AI.a_b(board, Integer.parseInt(str.substring(1,2)));
-	   int[] result = str_to_vec(root.choose).clone();
+	   board[root.to] = board[root.from];
+	   board[root.from] = 0;
 	   OutputStreamWriter osw = new OutputStreamWriter(op,"utf-8");
        osw.write("HTTP/1.1 200 OK\r\n");
        osw.write("Content-Type: text/plain;charset=UTF-8\r\n");
@@ -36,9 +36,9 @@ public class Chess {
 ////       osw.write("Date: Tue, 19 May 2015 02:48:27 GMT\r\n");
        osw.write("\r\n");
 //       osw.write("c9\r\n");
-       System.out.println("���ؽ��");
-       m_AI.m_print(result);
-       osw.write(vec_to_str(result));
+       System.out.println("返回结果");
+       m_AI.m_print(board);
+       osw.write(vec_to_str(board));
        osw.flush();
        osw.close();
        op.flush();
@@ -53,7 +53,7 @@ public class Chess {
 	    }
     public static void main(String[] args)  throws IOException{
     	
-//        int[] board = { // ���ڿ���
+//        int[] board = { // 中炮开局
 //                1, 3, 5, 7,16, 8, 6, 4, 2,
 //                0, 0, 0, 0, 0, 0, 0, 0, 0,
 //                0, 9, 0, 0, 0, 0, 0,10, 0,
@@ -65,6 +65,12 @@ public class Chess {
 //                0, 0, 0, 0, 0, 0, 0, 0, 0,
 //                17,19,21,23,32,24,22,20,18
 //        };
+//        AI m_AI = new AI();
+//        node root = m_AI.a_b(board, Integer.parseInt("4"));
+//        board[root.to] = board[root.from];
+//        board[root.from] = 0;
+////        int[] result = str_to_vec(root.choose).clone();
+//        m_AI.m_print(board);
         ServerSocket serverSocket = new ServerSocket(8099);  
         while(true){
 	        Socket socket = serverSocket.accept(); 
