@@ -46,8 +46,9 @@ public class MainActivity extends AppCompatActivity {
     AI m_AI = new AI();
     int last_time;
     int last_min;
-    int mode = 0;
-
+    int mode = 3;
+    String server_url = "http://119.29.204.118:8099";
+//      String server_url = "http://192.168.204.1:8099";
     // 悔棋
     void oh_no(View view) {
 //        if(!my_turn) {
@@ -475,7 +476,7 @@ public class MainActivity extends AppCompatActivity {
     }
     void send_chess() {
         try {
-            String baseUrl = "http://119.29.204.118:8099";
+            String baseUrl = server_url;
             //合成参数
             StringBuilder tempParams = new StringBuilder();
             int pos = 0;

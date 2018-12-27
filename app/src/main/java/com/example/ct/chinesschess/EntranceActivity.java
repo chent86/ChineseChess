@@ -15,7 +15,7 @@ public class EntranceActivity extends AppCompatActivity {
     void click1(View view) {
         Intent intent=new Intent(getApplicationContext(),MainActivity.class);
         Bundle bundle=new Bundle();
-        bundle.putInt("mode", 0);
+        bundle.putInt("mode", 4);
         intent.putExtras(bundle);
         startActivity(intent);
     }
@@ -23,7 +23,7 @@ public class EntranceActivity extends AppCompatActivity {
     void click2(View vide) {
         Intent intent=new Intent(getApplicationContext(),MainActivity.class);
         Bundle bundle=new Bundle();
-        bundle.putInt("mode", 1);
+        bundle.putInt("mode", 5);
         intent.putExtras(bundle);
         startActivity(intent);
     }
